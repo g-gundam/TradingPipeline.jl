@@ -1,4 +1,5 @@
 module TradingPipeline
+using DocStringExtensions
 
 include("pnl.jl")
 include("report.jl")
