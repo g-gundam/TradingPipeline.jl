@@ -4,10 +4,15 @@ authors = ["contributors"]
 version = "0.1.0-DEV"
 
 [deps]
+Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
+ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 
 [compat]
+Chain = "0.6.0"
+DataFrames = "1.7.0"
 DocStringExtensions = "0.9.3"
 Printf = "1.11.0"
 julia = "1.6.7"
