@@ -5,16 +5,24 @@ version = "0.1.0-DEV"
 
 [deps]
 Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
+CryptoMarketData = "57973c84-8724-49d2-9af5-7f2266b21095"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
 ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
+ReversedSeries = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
+Rocket = "df971d30-c9d6-4b37-b8ff-e965b2cb3a40"
+TechnicalIndicatorCharts = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
 
 [compat]
 Chain = "0.6.0"
+CryptoMarketData = "1.0.5"
 DataFrames = "1.7.0"
 DocStringExtensions = "0.9.3"
 Printf = "1.11.0"
+ReversedSeries = "1.0.0"
+Rocket = "1.8.1"
+TechnicalIndicatorCharts = "0.6.0"
 julia = "1.6.7"
 
 [extras]
