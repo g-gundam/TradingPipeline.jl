@@ -2,7 +2,7 @@
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "b7d8a65877ab717ae1ebee40b0e7f7093ce6ed54"
+project_hash = "61e2f476c8843b7696aa2ea2b7544911521fcc4b"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -183,6 +183,12 @@ deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapp
 git-tree-sha1 = "627fcacdb7cb51dc67f557e1598cdffe4dda386d"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "1.10.14"
+
+[[deps.HierarchicalStateMachines]]
+deps = ["Logging"]
+git-tree-sha1 = "417feed497c60631b562f210588c6992f1a0a48a"
+uuid = "abad772c-f3cd-4a0c-a45e-a2ff9a47795a"
+version = "0.1.0"
 
 [[deps.InlineStrings]]
 git-tree-sha1 = "45521d31238e87ee9f9732561bfee12d4eebd52d"
