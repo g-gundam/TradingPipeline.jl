@@ -213,3 +213,38 @@ function Rocket.on_next!(actor::SimulatorSessionActor, c::Candle)
     XO.update!(session, c.ts, c.l)
     XO.update!(session, c.ts, c.c)
 end
+
+
+
+# This used to be called ExchangeDriverSubject, but I wanted to be more specific,
+# because there are going to be many different exchange drivers.  Some exchanges
+# may have more than one driver depending on how one wants to open/close positions.
+
+struct SimulatorExchangeDriverSubject <: AbstractSubject{Any}
+    session::XO.AbstractSession
+    subscribers::Vector
+end
+
+function Rocket.on_subscribe!(subject::SimulatorExchangeDriverSubject, actor)
+    push!(subject.subscribers, actor)
+    return voidTeardown
+end
+
+function Rocket.on_complete!(subject::SimulatorExchangeDriverSubject)
+    @info :complete subject
+end
+
+# Position sizing decisions should be made here, but how?
+
+function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::TradeDecision.T)
+    session = subject.session
+    if decision == TradeDecision.Long
+        XO.send!(session, XO.SimulatorMarketBuy(1.0))
+    elseif decision == TradeDecision.CloseLong
+        XO.send!(session, XO.SimulatorMarketSell(1.0))
+    elseif decision == TradeDecision.Short
+        XO.send!(session, XO.SimulatorMarketSell(1.0))
+    elseif decision == TradeDecision.CloseShort
+        XO.send!(session, XO.SimulatorMarketBuy(1.0))
+    end
+end
