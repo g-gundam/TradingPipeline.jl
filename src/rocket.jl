@@ -49,3 +49,143 @@ end
 function Base.getindex(subject::ChartSubject, k::Symbol)
     return subject.charts[k]
 end
+
+
+
+abstract type AbstractExchangeResponse end
+struct ExchangeFill <: AbstractExchangeResponse end
+
+abstract type AbstractManualCommand end # I haven't used these yet.
+struct ManualPause <: AbstractManualCommand end
+struct ManualResume <: AbstractManualCommand end
+
+# These are the only messages a StrategySubject sends to its subscribers.
+@enumx TradeDecision begin
+    Long
+    CloseLong
+    Short
+    CloseShort
+end
+
+@kwdef mutable struct StrategySubject <: Rocket.AbstractSubject{Any}
+    # This strategy only needs one chart.
+    strategy::AbstractStrategy
+    hsm::Union{Missing,HSM.AbstractHsmState} = missing
+    subscribers::Vector = []
+end
+
+function Rocket.on_subscribe!(subject::StrategySubject, actor)
+    push!(subject.subscribers, actor)
+    return voidTeardown
+end
+
+# candle completion event from chart
+function Rocket.on_next!(subject::StrategySubject, t::Tuple{Symbol, Candle})
+    # figure out current state
+    # take the appropriate action for the current state
+    # emit trading decisions if conditions are met
+    current_state = HSM.active_state(subject.hsm)
+    transition = decide(subject.strategy, current_state)
+    if transition !== nothing
+        HSM.handle_event!(subject.hsm, transition)
+    end
+end
+
+# fill (or error) from exchange
+function Rocket.on_next!(subject::StrategySubject, xr::AbstractExchangeResponse)
+    current_state = HSM.active_state(subject.hsm)
+    transition = decide(subject.strategy, current_state, xr) # Take more parameters to help decide the next move.
+    if transition !== nothing
+        HSM.handle_event!(subject.hsm, transition)
+    end
+end
+
+"""
+From neutral, decide whether to go long or short.
+"""
+function decide(strategy::AbstractStrategy, state::Neutral)
+    long = should_open_long(strategy)
+    short = should_open_short(strategy)
+
+    # if both are true for some reason, do nothing
+    if long && short
+        # TODO: Add market timestamp.
+        @warn :decide strategy=typeof(strategy) message="Both long and short conditions are true."
+        return nothing
+    end
+    # otherwise, ask the exchange drivers to get in position.
+    if long
+        return OpenLongSignal()
+    end
+    if short
+        return OpenShortSignal()
+    end
+end
+
+function decide(strategy::AbstractStrategy, state::InLong)
+    if should_close_long(strategy)
+        return CloseLongSignal()
+    end
+end
+
+function decide(strategy::AbstractStrategy, state::InShort)
+    if should_close_short(strategy)
+        return CloseShortSignal()
+    end
+end
+
+# With enough method dispatch magic, the amount of code I need to write becomes very small.
+# I'm just translating a fill notification into a fill state transition.
+
+decide(strategy::AbstractStrategy, state::WantToLong) = nothing
+decide(strategy::AbstractStrategy, state::WantToLong, xr::ExchangeFill) = Fill()
+decide(strategy::AbstractStrategy, state::WantToCloseLong) = nothing
+decide(strategy::AbstractStrategy, state::WantToCloseLong, xr::ExchangeFill) = Fill()
+decide(strategy::AbstractStrategy, state::WantToShort) = nothing
+decide(strategy::AbstractStrategy, state::WantToShort, xr::ExchangeFill) = Fill()
+decide(strategy::AbstractStrategy, state::WantToCloseShort) = nothing
+decide(strategy::AbstractStrategy, state::WantToCloseShort, xr::ExchangeFill) = Fill()
+
+# Most trade decisions are sent to subscribers during on_entry! into the Want* states.
+
+function HSM.on_entry!(state::Neutral)
+    @info "Neutral"
+end
+
+function HSM.on_entry!(state::WantToLong)
+    @info "WantToLong"
+    for sub in state.subject.subscribers
+        next!(sub, TradeDecision.Long)
+    end
+end
+
+function HSM.on_entry!(state::InLong)
+    @info "InLong"
+end
+
+function HSM.on_entry!(state::WantToCloseLong)
+    @info "WantToCloseLong"
+    for sub in state.subject.subscribers
+        next!(sub, TradeDecision.CloseLong)
+    end
+end
+
+function HSM.on_entry!(state::WantToShort)
+    @info "WantToShort"
+    for sub in state.subject.subscribers
+        next!(sub, TradeDecision.Short)
+    end
+end
+
+function HSM.on_entry!(state::InShort)
+    @info "InShort"
+end
+
+function HSM.on_entry!(state::WantToCloseShort)
+    @info "WantToCloseShort"
+    for sub in state.subject.subscribers
+        next!(sub, TradeDecision.CloseShort)
+    end
+end
+
+
