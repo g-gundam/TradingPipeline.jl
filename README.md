@@ -13,4 +13,4 @@
 
 ## What's going to be in here?
 
-- ...a lot, but somehow not enough!
+- ...a lot
