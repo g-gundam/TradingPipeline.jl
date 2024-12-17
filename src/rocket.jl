@@ -248,3 +248,34 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
         XO.send!(session, XO.SimulatorMarketBuy(1.0))
     end
 end
+
+
+
+# This receives async messages from the exchange (XO.AbstractResposne)
+# and translates it into something more generic for StrategySubject to consume.
+# These may have to be exchange-specific.
+# This one works for the simulator.
+
+struct ExchangeFillSubject <: AbstractSubject{Any}
+    subscribers::Vector
+end
+
+function Rocket.on_subscribe!(subject::ExchangeFillSubject, actor)
+    push!(subject.subscribers, actor)
+    return voidTeardown
+end
+
+function Rocket.on_complete!(subject::ExchangeFillSubject)
+    @info :complete subject
+end
+
+function Rocket.on_next!(subject::ExchangeFillSubject, response::XO.AbstractResponse)
+    for sub in subject.subscribers
+        next!(sub, ExchangeFill())
+        # XXX: There needs to be more information in ExchangeFill instances.
+        # - timestamp (with exchange time)
+        # - price (that the fill happeend at)
+        # - quantity (that was filled)
+        #   + (also standardize on amount or quantity.  PICK ONE!)
+    end
+end
