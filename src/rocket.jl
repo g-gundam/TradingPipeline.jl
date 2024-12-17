@@ -52,14 +52,45 @@ end
 
 
 
+"""
+An **AbstractExchangeResponse** represents a message that was received from an ExchangeFillSubject.
+The most common is **ExchangeFill** which lets the StrategySubject know that after putting out an
+intent to open or close a position, the exchange has filled the order and the requested position
+change has occurred.
+
+# Example
+
+```julia-repl
+julia> subtypes(TradingPipeline.AbstractExchangeResponse)
+```
+"""
 abstract type AbstractExchangeResponse end
 struct ExchangeFill <: AbstractExchangeResponse end
 
+"""
+An **AbstractManualCommand** represents a manual intervention from a human to the StrategySubject.
+
+# Example
+
+```julia-repl
+julia> subtypes(TradingPipeline.AbstractExchangeResponse)
+```
+"""
 abstract type AbstractManualCommand end # I haven't used these yet.
 struct ManualPause <: AbstractManualCommand end
 struct ManualResume <: AbstractManualCommand end
 
-# These are the only messages a StrategySubject sends to its subscribers.
+"""
+TradeDecision was created with @enumx to define the 4 messages that can be emitted by a StrategySubject.
+
+- Long
+- CloseLong
+- Short
+- CloseShort
+
+These requests are typically sent by a StrategySubject to an ExchangeDriver that will interpret them and
+perform concrete operations through an exchange API to open or close a position.
+"""
 @enumx TradeDecision begin
     Long
     CloseLong
@@ -67,10 +98,27 @@ struct ManualResume <: AbstractManualCommand end
     CloseShort
 end
 
+"""
+StrategySubjectMode was created with @enumx to define 3 modes of operation for the StrategySubject
+
+- Normal
+- LongOnly
+- ShortOnly
+
+This makes it so that a new strategy doesn't have to be implemented if I wanted to test an existing
+strategy in a long-only or short-only way.
+"""
+@enumx StrategySubjectMode begin
+    Normal
+    LongOnly
+    ShortOnly
+end
+
 @kwdef mutable struct StrategySubject <: Rocket.AbstractSubject{Any}
     # This strategy only needs one chart.
     strategy::AbstractStrategy
     hsm::Union{Missing,HSM.AbstractHsmState} = missing
+    mode::StrategySubjectMode.T = StrategySubjectMode.Normal
     subscribers::Vector = []
 end
 
