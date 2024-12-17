@@ -189,3 +189,27 @@ function HSM.on_entry!(state::WantToCloseShort)
 end
 
 
+
+# This is for keeping the price updated in the simulator_session.
+# It also got a side job of shutting down a scheduled task after simulation completion.
+
+@kwdef struct SimulatorSessionActor <: NextActor{Candle}
+    session::XO.AbstractSession
+    t_fill::Union{Missing,Task}
+end
+
+function Rocket.on_complete!(actor::SimulatorSessionActor)
+    @info :complete msg=typeof(actor)
+    if !ismissing(actor.t_fill)
+        @info :cleanup msg="t_fill"
+        schedule(actor.t_fill, InterruptException(); error=true)
+    end
+end
+
+function Rocket.on_next!(actor::SimulatorSessionActor, c::Candle)
+    session = actor.session
+    XO.update!(session, c.ts, c.o)
+    XO.update!(session, c.ts, c.h)
+    XO.update!(session, c.ts, c.l)
+    XO.update!(session, c.ts, c.c)
+end
