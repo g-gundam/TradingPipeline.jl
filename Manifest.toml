@@ -2,7 +2,7 @@
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "82f1b485e95c04fa4ac7cb76c88698a5f32a44c0"
+project_hash = "ad09638e31dc9b8cbc21d01ca3826feeb3ca7aba"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -145,7 +145,7 @@ version = "0.1.11"
 deps = ["Dates", "DocStringExtensions", "EnumX", "HTTP", "NanoDates", "Random", "TidyTest", "UUIDs", "Web3"]
 path = "../ExchangeOperations.jl"
 uuid = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
-version = "1.0.0-DEV"
+version = "0.0.1"
 
 [[deps.ExprTools]]
 git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
