@@ -149,8 +149,17 @@ function Rocket.on_next!(subject::StrategySubject, xr::AbstractExchangeResponse)
 end
 
 """
+    decide(strategy::AbstractStrategy, state::HSM.AbstractHsmState)
+    -> Union{Nothing, TradeDecision.T}
 
-From neutral, decide whether to go long or short.
+The decide method takes the current strategy and the current state
+according to the state machine, and looks at the market data available
+to it to make a decision.  Often, it decides to return `nothing`, but
+if conditions as defined by the strategy are met, it could return an
+`HSM.AbstractHsmEvent` which will cause the state machine to move to
+the next appropriate state.
+
+There are decide methods for every state in the state machine.
 """
 function decide(strategy::AbstractStrategy, state::Neutral)
     long = should_open_long(strategy)
