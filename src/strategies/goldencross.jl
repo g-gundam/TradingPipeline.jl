@@ -55,6 +55,6 @@ function load_strategy(::Type{GoldenCrossStrategy}; symbol="BTCUSD", tf=Hour(4))
     all_charts = Dict(:trend => golden_cross_chart)
     chart_subject = ChartSubject(all_charts, [])
     gcstrat = GoldenCrossStrategy(golden_cross_chart)
-    strategy_subject = StrategySubject(gcstrat, missing, [])
+    strategy_subject = StrategySubject(strategy=gcstrat)
     return (chart_subject, strategy_subject)
 end
