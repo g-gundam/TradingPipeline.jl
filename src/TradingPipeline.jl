@@ -9,5 +9,6 @@ include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("rocket.jl")
+include("pipeline.jl")
 
 end
