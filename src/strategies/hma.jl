@@ -63,6 +63,6 @@ function load_strategy(::Type{HMAStrategy}; symbol="BTCUSD", tf=Hour(4))
     all_charts = Dict(:trend => hma_chart)
     chart_subject = ChartSubject(all_charts, [])
     strategy = HMAStrategy(hma_chart)
-    strategy_subject = StrategySubject(strategy, missing, [])
+    strategy_subject = StrategySubject(;strategy)
     return (chart_subject, strategy_subject)
 end
