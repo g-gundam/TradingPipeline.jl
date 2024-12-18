@@ -149,6 +149,7 @@ function Rocket.on_next!(subject::StrategySubject, xr::AbstractExchangeResponse)
 end
 
 """
+
 From neutral, decide whether to go long or short.
 """
 function decide(strategy::AbstractStrategy, state::Neutral)
