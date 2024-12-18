@@ -7,3 +7,5 @@
 # It's job is to run a simulation to completion.
 # It should return the simulator_session.
 # Maybe the chart_subject and strategy_subject, too.
+#
+# test
