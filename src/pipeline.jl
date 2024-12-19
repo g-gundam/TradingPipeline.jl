@@ -10,12 +10,18 @@
 #
 # test
 
+# XXX: I'm so sorry.
+global strategy_subject = nothing
+
 "Is this allowed?"
 function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; kwargs...)
     candle_subject = Subject(Candle)
     (chart_subject, strategy_subject) = load_strategy(strategy_type)
-    @info :t typeof(strategy_subject)
-    hsm = @hsm strategy_subject # XXX: This macro is not working.  Go back to include?
+    global strategy_subject = strategy_subject # XXX: FUUUUUUUU
+    @info :file dirname(@__FILE__)
+    src = dirname(@__FILE__)
+    hsm = include("$(src)/hsm_instance.jl") # XXX: Let's see.
+    strategy_subject.hsm = hsm
     HSM.transition_to_state!(hsm, hsm)
     state = HSM.active_state(strategy_subject.hsm)
     @info :state typeof(state) typeof(hsm.state_info.active_substate)

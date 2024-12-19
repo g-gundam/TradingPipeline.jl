@@ -6,8 +6,10 @@
 # I think I'm going to need this for strategy implementation.
 # turnstile
 
+using HierarchicalStateMachines
 import HierarchicalStateMachines as HSM
 using Rocket
+using UnPack
 
 macro strategy_state(name)
     return :(
@@ -44,11 +46,10 @@ const TP = TradingPipeline
 Given a StrategySubject instance, define the states and transitions for a
 MarketOrderStrategyStateMachine, and return the singleton instance of that state machine.
 """
-macro hsm(strategy_subject::AbstractSubject)
+macro hsm(strategy_subject::Any)
     return quote
         local strategy_subject = $(esc(strategy_subject))
         local TP = TradingPipeline
-        local HSM = HierarchicalStateMachines
 
         hsm                 = TP.MarketOrderStrategyStateMachine(nothing, strategy_subject)
         neutral             = TP.Neutral(hsm, strategy_subject)
@@ -59,63 +60,116 @@ macro hsm(strategy_subject::AbstractSubject)
         in_short            = TP.InShort(hsm, strategy_subject)
         want_to_close_short = TP.WantToCloseShort(hsm, strategy_subject)
 
-        function HSM.on_initialize!(state::TP.MarketOrderStrategyStateMachine)
-            HSM.transition_to_state!(hsm, neutral)
-        end
+        strategy_subject.hsm = hsm
+
+        eval(quote
+            function HierarchicalStateMachines.on_initialize!(state::TP.MarketOrderStrategyStateMachine)
+                HierarchicalStateMachines.transition_to_state!($hsm, $neutral)
+            end
+        end)
 
         # define transitions
-        function HSM.on_event!(state::TP.Neutral, event::TP.OpenLongSignal)
-            HSM.transition_to_state!(hsm, want_to_long)
-            return true
-        end
+        eval(quote
+            "OpenLongSignal"
+            function HSM.on_event!(state::TP.Neutral, event::TP.OpenLongSignal)
+                HSM.transition_to_state!($hsm, $want_to_long)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.WantToLong, event::TP.Fill)
-            HSM.transition_to_state!(hsm, in_long)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.WantToLong, event::TP.Fill)
+                HSM.transition_to_state!($hsm, $in_long)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.InLong, event::TP.CloseLongSignal)
-            HSM.transition_to_state!(hsm, want_to_close_long)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.InLong, event::TP.CloseLongSignal)
+                HSM.transition_to_state!($hsm, $want_to_close_long)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.InLong, event::TP.StopFill)
-            HSM.transition_to_state!(hsm, neutral)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.InLong, event::TP.StopFill)
+                HSM.transition_to_state!($hsm, $neutral)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.WantToCloseLong, event::TP.Fill)
-            HSM.transition_to_state!(hsm, neutral)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.WantToCloseLong, event::TP.Fill)
+                HSM.transition_to_state!($hsm, $neutral)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.Neutral, event::TP.OpenShortSignal)
-            HSM.transition_to_state!(hsm, want_to_short)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.Neutral, event::TP.OpenShortSignal)
+                HSM.transition_to_state!($hsm, $want_to_short)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.WantToShort, event::TP.Fill)
-            HSM.transition_to_state!(hsm, in_short)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.WantToShort, event::TP.Fill)
+                HSM.transition_to_state!($hsm, $in_short)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.InShort, event::TP.CloseShortSignal)
-            HSM.transition_to_state!(hsm, want_to_close_short)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.InShort, event::TP.CloseShortSignal)
+                HSM.transition_to_state!($hsm, $want_to_close_short)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.InShort, event::TP.StopFill)
-            HSM.transition_to_state!(hsm, neutral)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.InShort, event::TP.StopFill)
+                HSM.transition_to_state!($hsm, $neutral)
+                return true
+            end
+        end)
 
-        function HSM.on_event!(state::TP.WantToCloseShort, event::TP.Fill)
-            HSM.transition_to_state!(hsm, neutral)
-            return true
-        end
+        eval(quote
+            function HSM.on_event!(state::TP.WantToCloseShort, event::TP.Fill)
+                HSM.transition_to_state!($hsm, $neutral)
+                return true
+            end
+        end)
 
-        hsm
+        @info "yeah"
+        (;hsm, neutral, want_to_long, in_long, want_to_close_long, want_to_short, in_short, want_to_close_short)
     end
 end
 
 export @hsm
+
+if false
+    
+    using CryptoMarketData
+    using TechnicalIndicatorCharts
+    using ReversedSeries
+    import ExchangeOperations as XO
+    using UnPack
+
+    http_options = Dict(:proxy => "http://gg:ggggbabybabybaby@trader0:3128")
+    pancakeswap = PancakeSwap(http_options)
+    btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"))
+
+    import TradingPipeline as TP
+    import HierarchicalStateMachines as HSM
+    using TradingPipeline
+    using TradingPipeline: simulate, HMAStrategy, df_candles_observable, @hsm
+    using TradingPipeline: load_strategy
+
+    (chart_subject, strategy_subject) = load_strategy(HMAStrategy)
+    @unpack hsm, neutral, want_to_long = @hsm strategy_subject
+    HSM.transition_to_state!(hsm, hsm)
+
+    candle_observable = df_candles_observable(btcusd1m)
+    simulate(candle_observable, HMAStrategy)
+
+end
