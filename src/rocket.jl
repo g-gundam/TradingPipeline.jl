@@ -260,7 +260,9 @@ function Rocket.on_complete!(actor::SimulatorSessionActor)
     @info :complete msg=typeof(actor)
     if !ismissing(actor.t_fill)
         @info :cleanup msg="t_fill"
-        schedule(actor.t_fill, InterruptException(); error=true)
+        setTimeout(1000) do
+            schedule(actor.t_fill, InterruptException(); error=true)
+        end
     end
 end
 
