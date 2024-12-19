@@ -7,6 +7,7 @@ using Dates
 using DocStringExtensions
 using EnumX
 using Printf
+using UnPack
 
 # work of people I've interacted with
 import HierarchicalStateMachines as HSM
