@@ -41,12 +41,20 @@ struct CloseShortSignal <: HSM.AbstractHsmEvent end
 
 const TP = TradingPipeline
 
+
+
+# XXX: [2024-12-18 Wed 22:56] Everything from here down can be ignored.
+
 """    @hsm strategy_subject
 
 Given a StrategySubject instance, define the states and transitions for a
 MarketOrderStrategyStateMachine, and return the singleton instance of that state machine.
 """
 macro hsm(strategy_subject::Any)
+    # XXX: This macro doesn't quite work as intended.
+    # Strangely, it's OK if I use it from the REPL.
+    # However, if used within the simulate function, the hsm it returns doesn't work as intended.
+    # I have no idea why.
     return quote
         local strategy_subject = $(esc(strategy_subject))
         local TP = TradingPipeline
@@ -147,13 +155,19 @@ end
 
 export @hsm
 
+
+
+# REPL work
+
 if false
     
     using CryptoMarketData
     using TechnicalIndicatorCharts
     using ReversedSeries
     import ExchangeOperations as XO
+
     using UnPack
+    using LightweightCharts
 
     http_options = Dict(:proxy => "http://gg:ggggbabybabybaby@trader0:3128")
     pancakeswap = PancakeSwap(http_options)
@@ -163,13 +177,9 @@ if false
     import HierarchicalStateMachines as HSM
     using TradingPipeline
     using TradingPipeline: simulate, HMAStrategy, df_candles_observable, @hsm
-    using TradingPipeline: load_strategy
-
-    (chart_subject, strategy_subject) = load_strategy(HMAStrategy)
-    @unpack hsm, neutral, want_to_long = @hsm strategy_subject
-    HSM.transition_to_state!(hsm, hsm)
+    using TradingPipeline: load_strategy, report
 
     candle_observable = df_candles_observable(btcusd1m)
-    simulate(candle_observable, HMAStrategy)
+    @unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
 
 end
