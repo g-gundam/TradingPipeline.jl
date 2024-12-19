@@ -11,20 +11,52 @@
 # test
 
 # XXX: I'm so sorry.
+"`strategy_subject` is global so that the `include` of hsm_instance.jl works."
 global strategy_subject = nothing
 
-"Is this allowed?"
+"`simulate_sanity_check_failure_error` is a tuple filled with a lot of nothing values so that
+code that's @unpack'ing return values from `simulate()` don't crash."
+simulate_sanity_check_failure_error = (
+    hsm = nothing,
+    simulator_session = nothing,
+    simulator_exchange_driver_subject = nothing,
+    fill_observable = nothing,
+    chart_subject = nothing,
+    strategy_subject = nothing,
+    simulator_session_actor = nothing,
+)
+
+"""$(TYPEDSIGNATURES)
+Run a strategy on the simulator using the given `candle_observable`.
+
+## Return Values
+
+A named tuple with the following keys will be returned:
+simulator_session, hsm, simultator_exchange_driver_subject,
+fill_observable, chart_subject, strategy_subject, simulator_session_actor.
+
+# Example
+
+```julia-repl
+julia> candle_observable = df_candles_observable(btcusd1m)
+IterableObservable(Candle, Vector{Candle}, Rocket.AsapScheduler)
+
+julia> @unpack simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
+```
+"""
 function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; kwargs...)
     candle_subject = Subject(Candle)
     (chart_subject, strategy_subject) = load_strategy(strategy_type)
     global strategy_subject = strategy_subject # XXX: FUUUUUUUU
-    @info :file dirname(@__FILE__)
     src = dirname(@__FILE__)
-    hsm = include("$(src)/hsm_instance.jl") # XXX: Let's see.
+    hsm = include("$(src)/hsm_instance.jl") # INFO: It worked.  If HSM gets a v2, I hope I can remove this.
     strategy_subject.hsm = hsm
     HSM.transition_to_state!(hsm, hsm)
-    state = HSM.active_state(strategy_subject.hsm)
-    @info :state typeof(state) typeof(hsm.state_info.active_substate)
+    sanity_check = typeof(HSM.active_state(hsm))
+    if sanity_check != TradingPipeline.Neutral
+        @error "wtf" sanity_check should_be=TradingPipeline.Neutral
+        return simulate_sanity_check_failure_error
+    end
 
     # Connect strategy_subject => simulator_exchange_driver_subject
     simulator_session = XO.SimulatorSession()
@@ -53,5 +85,12 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     # This will put everything in motion.
     subscribe!(candle_observable, candle_subject)
 
-    return simulator_session # maybe more later
+    (;
+     simulator_session,
+     hsm,
+     simulator_exchange_driver_subject,
+     fill_observable,
+     chart_subject,
+     strategy_subject,
+     simulator_session_actor)
 end
