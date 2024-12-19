@@ -32,8 +32,8 @@ Run a strategy on the simulator using the given `candle_observable`.
 ## Return Values
 
 A named tuple with the following keys will be returned:
-simulator_session, hsm, simultator_exchange_driver_subject,
-fill_observable, chart_subject, strategy_subject, simulator_session_actor.
+`simulator_session`, `hsm`, `simultator_exchange_driver_subject`,
+`fill_observable`, `chart_subject`, `strategy_subject`, `simulator_session_actor`.
 
 # Example
 
