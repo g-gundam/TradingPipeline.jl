@@ -17,6 +17,7 @@ Printf = "de0858da-6303-5e67-8744-51eddeeeb8d7"
 ReversedSeries = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
 Rocket = "df971d30-c9d6-4b37-b8ff-e965b2cb3a40"
 TechnicalIndicatorCharts = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
+UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 Chain = "0.6.0"
@@ -31,6 +32,7 @@ Printf = "1.11.0"
 ReversedSeries = "1.0.0"
 Rocket = "1.8.1"
 TechnicalIndicatorCharts = "0.6.0"
+UnPack = "1.0.2"
 julia = "1.6.7"
 
 [extras]
