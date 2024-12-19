@@ -56,6 +56,7 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     if sanity_check != TradingPipeline.Neutral
         @error "wtf" sanity_check should_be=TradingPipeline.Neutral
         return simulate_sanity_check_failure_error
+        #return simulate(candle_observable, strategy_type; kwargs...) # XXX: It'll succeed the second time!
     end
 
     # Connect strategy_subject => simulator_exchange_driver_subject
