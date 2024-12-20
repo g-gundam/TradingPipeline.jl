@@ -5,3 +5,4 @@
 /docs/build/
 .dir-locals.el
 data
+notebooks/_*.jl
