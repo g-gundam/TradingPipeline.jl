@@ -22,11 +22,14 @@ import ExchangeOperations as XO
 
 include("pnl.jl")
 include("report.jl")
+export report
 include("hsm_types.jl")
 include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
+export load_strategy
 include("rocket.jl")
 include("pipeline.jl")
+export simulate
 
 end
