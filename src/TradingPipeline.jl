@@ -8,6 +8,7 @@ using DocStringExtensions
 using EnumX
 using Printf
 using UnPack
+using Rocket
 
 # work of people I've interacted with
 import HierarchicalStateMachines as HSM
