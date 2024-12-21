@@ -39,7 +39,7 @@ end
 # REPL work
 
 if false
-    
+
     using CryptoMarketData
     using TechnicalIndicatorCharts
     using ReversedSeries
