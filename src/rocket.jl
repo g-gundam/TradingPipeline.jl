@@ -335,7 +335,6 @@ function Rocket.on_next!(subject::ExchangeFillSubject, response::XO.AbstractResp
         # XXX: There needs to be more information in ExchangeFill instances.
         # - timestamp (with exchange time)
         # - price (that the fill happeend at)
-        # - quantity (that was filled)
-        #   + (also standardize on amount or quantity.  PICK ONE!)
+        # - amount (that was filled)
     end
 end
