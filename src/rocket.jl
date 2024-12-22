@@ -15,9 +15,9 @@ end
 
 
 
-mutable struct ChartSubject <: Rocket.AbstractSubject{Candle}
+@kwdef mutable struct ChartSubject <: Rocket.AbstractSubject{Candle}
     charts::Dict{Symbol,Chart}
-    subscribers::Vector
+    subscribers::Vector = []
 end
 
 function Rocket.on_subscribe!(subject::ChartSubject, actor)
