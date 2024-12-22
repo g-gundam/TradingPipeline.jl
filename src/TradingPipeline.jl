@@ -38,26 +38,25 @@ end
 
 # REPL work
 
-if false
+#=
+using CryptoMarketData
+using TechnicalIndicatorCharts
+using ReversedSeries
+import ExchangeOperations as XO
 
-    using CryptoMarketData
-    using TechnicalIndicatorCharts
-    using ReversedSeries
-    import ExchangeOperations as XO
+using UnPack
+using LightweightCharts
 
-    using UnPack
-    using LightweightCharts
+pancakeswap = PancakeSwap()
+btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"))
 
-    pancakeswap = PancakeSwap()
-    btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"))
+import TradingPipeline as TP
+import HierarchicalStateMachines as HSM
+using TradingPipeline
+using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, df_candles_observable, @hsm
+using TradingPipeline: load_strategy, report
 
-    import TradingPipeline as TP
-    import HierarchicalStateMachines as HSM
-    using TradingPipeline
-    using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, df_candles_observable, @hsm
-    using TradingPipeline: load_strategy, report
-
-    candle_observable = df_candles_observable(btcusd1m)
-    #@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
-
-end
+candle_observable = df_candles_observable(btcusd1m)
+@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
+df = report(simulator_session)
+=#
