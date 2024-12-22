@@ -62,6 +62,7 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     # Connect strategy_subject => simulator_exchange_driver_subject
     simulator_session = XO.SimulatorSession()
     simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(simulator_session, [])
+    #strategy_subject.session = simulator_session # totally optional
     subscribe!(strategy_subject, simulator_exchange_driver_subject)
 
     # connect the simulator to candle_subject

@@ -119,6 +119,7 @@ end
     strategy::AbstractStrategy
     hsm::Union{Missing,HSM.AbstractHsmState} = missing
     mode::StrategySubjectMode.T = StrategySubjectMode.Normal
+    session::Union{Missing,Any} = missing
     subscribers::Vector = []
 end
 
@@ -207,7 +208,15 @@ decide(strategy::AbstractStrategy, state::WantToCloseShort, xr::ExchangeFill) = 
 # Most trade decisions are sent to subscribers during on_entry! into the Want* states.
 
 function HSM.on_entry!(state::Neutral)
-    @info "Neutral"
+    session = state.subject.session
+    if !ismissing(session)
+        ts = session.state.ts
+        price = session.state.price
+        total = session.state.total
+        @info "Neutral" ts price total
+    else
+        @info "Neutral"
+    end
 end
 
 function HSM.on_entry!(state::WantToLong)
@@ -218,7 +227,14 @@ function HSM.on_entry!(state::WantToLong)
 end
 
 function HSM.on_entry!(state::InLong)
-    @info "InLong"
+    session = state.subject.session
+    if !ismissing(session)
+        ts = session.state.ts
+        price = session.state.price
+        @info "InLong" ts price
+    else
+        @info "InLong"
+    end
 end
 
 function HSM.on_entry!(state::WantToCloseLong)
