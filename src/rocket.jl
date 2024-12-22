@@ -251,7 +251,7 @@ end
 # This is for keeping the price updated in the simulator_session.
 # It also got a side job of shutting down a scheduled task after simulation completion.
 
-@kwdef struct SimulatorSessionActor <: NextActor{Candle}
+@kwdef mutable struct SimulatorSessionActor <: NextActor{Candle}
     session::XO.AbstractSession
     t_fill::Union{Missing,Task}
 end

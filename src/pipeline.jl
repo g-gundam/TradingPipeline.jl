@@ -64,6 +64,10 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(simulator_session, [])
     subscribe!(strategy_subject, simulator_exchange_driver_subject)
 
+    # connect the simulator to candle_subject
+    simulator_session_actor = SimulatorSessionActor(simulator_session, missing)
+    subscribe!(candle_subject, simulator_session_actor)
+
     # Create an observable for simulator_session.responses
     fill_observable = iterable(simulator_session.responses)
 
@@ -71,6 +75,7 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     exchange_fill_subject = ExchangeFillSubject([])
     t_fill = @task subscribe!(fill_observable, exchange_fill_subject)
     schedule(t_fill)
+    simulator_session_actor.t_fill = t_fill
     subscribe!(exchange_fill_subject, strategy_subject)
 
     # Connect chart_subject to strategy_subject
@@ -78,10 +83,6 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
 
     # Connect chart_subject to candle_subject.
     subscribe!(candle_subject, chart_subject)
-
-    # connect the simulator to candle_subject
-    simulator_session_actor = SimulatorSessionActor(simulator_session, t_fill)
-    subscribe!(candle_subject, simulator_session_actor)
 
     # This will put everything in motion.
     subscribe!(candle_observable, candle_subject)

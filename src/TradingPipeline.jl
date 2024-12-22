@@ -54,7 +54,7 @@ if false
     import TradingPipeline as TP
     import HierarchicalStateMachines as HSM
     using TradingPipeline
-    using TradingPipeline: simulate, HMAStrategy, df_candles_observable, @hsm
+    using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, df_candles_observable, @hsm
     using TradingPipeline: load_strategy, report
 
     candle_observable = df_candles_observable(btcusd1m)
