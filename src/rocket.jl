@@ -273,7 +273,7 @@ end
 end
 
 function Rocket.on_complete!(actor::SimulatorSessionActor)
-    @info :complete msg=typeof(actor)
+    @info :complete message=typeof(actor)
     if !ismissing(actor.t_fill)
         @info :cleanup msg="t_fill"
         setTimeout(1000) do
