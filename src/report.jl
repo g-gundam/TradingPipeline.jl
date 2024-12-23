@@ -44,7 +44,7 @@ function report(session::XO.SimulatorSession)
     end
     if !neutral
         # INFO: This is a marker for a position that was left open at the end of the simulation.
-        dt = DateTime(2222)
+        dt = DateTime(2222, 11, 11)
         close = if typeof(open) == XO.SimulatorMarketBuyFill
             XO.SimulatorMarketSellFill(;ts=dt, price=session.state.price, amount=open.amount)
         else
