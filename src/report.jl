@@ -9,10 +9,10 @@ import ExchangeOperations as XO
 function make_result(open::XO.SimulatorMarketBuyFill, close::XO.SimulatorMarketSellFill)
     r = @pnl open.price close.price close.amount
     return (action      = :long,
-            open_ts     = open.ts,
-            open_price  = open.price,
-            close_ts    = close.ts,
-            close_price = close.price,
+            entry_ts    = open.ts,
+            entry_price = open.price,
+            exit_ts     = close.ts,
+            exit_price  = close.price,
             amount      = close.amount,
             pnl         = r.profit_loss)
 end
@@ -20,10 +20,10 @@ end
 function make_result(open::XO.SimulatorMarketSellFill, close::XO.SimulatorMarketBuyFill)
     r = @pnls open.price close.price close.amount
     return (action      = :short,
-            open_ts     = open.ts,
-            open_price  = open.price,
-            close_ts    = close.ts,
-            close_price = close.price,
+            entry_ts    = open.ts,
+            entry_price = open.price,
+            exit_ts     = close.ts,
+            exit_price  = close.price,
             amount      = close.amount,
             pnl         = r.profit_loss)
 end
