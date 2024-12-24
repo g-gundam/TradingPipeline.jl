@@ -64,13 +64,15 @@ end
 
 Let's see if I can visualize trades on top of a chart.
 """
-function TechnicalIndicatorCharts.visualize(t::Tuple{Chart, XO.AbstractSession})
+function TechnicalIndicatorCharts.visualize(t::Tuple{Chart, XO.AbstractSession}; kwargs...)
     (chart, session) = t
+    defaults = (;)
+    kw = merge(defaults, kwargs)
     rdf = report(session)
-    layout = TechnicalIndicatorCharts.visualize(chart)
+    layout = TechnicalIndicatorCharts.visualize(chart; kw...)
     cell11 = layout.panels["cell11"]
     stix = cell11.charts[1]
-    index_of = ts::DateTime -> find_index(chart.df.ts, t -> t >= ts)
+    index_of = ts::DateTime -> ReversedSeries.find_index(chart.df.ts, t -> t >= ts)
     for row in eachrow(rdf)
         index2 = if ismissing(index_of(row.exit_ts))
             lastindex(chart.df.ts)
