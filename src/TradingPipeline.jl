@@ -27,6 +27,7 @@ include("hsm_types.jl")
 include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
+include("strategies/pluto.jl")
 export load_strategy
 include("rocket.jl")
 include("pipeline.jl")

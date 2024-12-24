@@ -45,17 +45,37 @@ begin
 	using UnPack
 	using LightweightCharts
 	using NomnomlJS
+	using OnlineTechnicalIndicators
 end
 
 # ╔═╡ 14ee20f3-2742-41d7-b816-0bb2f143e226
 md"""
-# Introduction
-- 00.jl is meant to be a template for strategy backtesting in Pluto notebooks.
-- It assumes a certain directory structure in order to load the latest versions of my libraries and be able to use Revise.jl in a notebook context.
-- Check out my Julia repos so that they're all next to each other like in the diagram.
-- Download the data pack from CryptoMarketData.jl and symlink it to data under TradingPipeline.jl
-  + ...or just use CryptoMarketData.jl to download candles yourself.
-- Right click on the image below and open image in new tab if the text is too small to read.
+# 01 HMA 4h Improvements
+- I'm going to take the naive, long-only HMA cross strategy from 00.jl, and try to soften or eliminate some of its weak spots.
+"""
+
+# ╔═╡ 5d6e8d7d-59a2-475a-a955-a065188d9c01
+md"""
+## Base Line Results - TP.HMAStrategy
+- 4 wins / 4 losses
+"""
+
+# ╔═╡ 824d9b52-c6c6-4d7c-8775-a51f56eeda28
+md"""
+### Trade 2:  Should be avoided, but how?
+
+### Trade 4 & 5:  Similar losses
+- I feel like these could have been turned into wins.
+- They're both what I would call late entries where the HMA cross happened way below the entry point.
+- HMA55 is nearby and steep.
+- They were also profitable for a while until they weren't.
+
+#### Solution
+- Identify this as a late entry.
+- In the should_close_long function, if we're known to be in a late entry position, take profit quickly after a certain gain is achieved.
+  + Don't wait for the HMA cross, because it'll be too late.
+
+### Trade 6:  I think this can be avoided
 """
 
 # ╔═╡ 38bd1675-650f-4276-becb-216f3da6b630
@@ -82,51 +102,153 @@ md"""
 - I think that'll let me iterate faster.
 """
 
+# ╔═╡ 95c40b88-a30a-4f39-bf1b-b8960d239339
+md"""
+## HMAStrategy - The Original
+"""
+
 # ╔═╡ 84d40e0c-ccd2-4e19-9770-30c01a9d26fc
 TP.HMAStrategy
+
+# ╔═╡ fb67c595-500a-43f8-9f06-b60226bae2c6
+x = 1
+
+# ╔═╡ e1b9d946-f59a-4db4-b20f-9f4d0626f45c
+md"""
+## PSA (Pluto Strategy A) - Taking Profit Sooner on Late Entries
+"""
+
+# ╔═╡ 45e75970-4627-4258-a1cd-a3cd028206b6
+function should_open_long(strategy::TP.PSA)
+    # if we're neutral and
+	@info "hi"
+    crossed_up(strategy.rf.hma330, strategy.rf.hma440)
+end
+
+# ╔═╡ 0856646f-565f-45bd-a17e-9eac33c82c73
+function should_close_long(strategy::TP.PSA)
+    # if we're long and
+    crossed_down(strategy.rf.hma330, strategy.rf.hma440)
+end
+
+# ╔═╡ 001b7749-0a24-4461-9729-203a0e454c6b
+function load_strategy(::Type{TP.PSA}; symbol="BTCUSD", tf=Hour(4))
+    hma_chart = Chart(
+        symbol, tf,
+        indicators = [
+            HMA{Float64}(;period=55),
+            HMA{Float64}(;period=110),
+            HMA{Float64}(;period=220),
+            HMA{Float64}(;period=330),
+            HMA{Float64}(;period=440)
+        ],
+        visuals = [
+            Dict(
+                :label_name => "HMA 55",
+                :line_color => "#e57373",
+                :line_width => 2
+            ),
+            Dict(
+                :label_name => "HMA 110",
+                :line_color => "#f39337",
+                :line_width => 1
+            ),
+            Dict(
+                :label_name => "HMA 220",
+                :line_color => "#ff6d00",
+                :line_width => 2
+            ),
+            Dict(
+                :label_name => "HMA 330",
+                :line_color => "#26c6da",
+                :line_width => 2
+            ),
+            Dict(
+                :label_name => "HMA 440",
+                :line_color => "#64b5f6",
+                :line_width => 3
+            )
+        ]
+    )
+    all_charts = Dict(:trend => hma_chart)
+    chart_subject = TP.ChartSubject(charts=all_charts)
+    strategy = TP.PSA(chart=hma_chart, rf=ReversedFrame(hma_chart.df))
+    strategy_subject = TP.StrategySubject(;strategy)
+    return (chart_subject, strategy_subject)
+end
+
+# ╔═╡ 8fddf9a0-cb7a-4bcb-bb0e-deb45877fef7
+tppsa = TP.PSA(chart=Chart("a", Hour(1)))
+
+# ╔═╡ 6791e328-8ba1-4299-beaf-abfd5cc64112
+should_open_long(tppsa)
 
 # ╔═╡ ef19c935-3270-46e3-97a0-8e874bb56643
 md"""
 # Simulator Session
 """
 
+# ╔═╡ f93d3f19-3893-4c61-b383-04e1394e79ea
+md"""
+## TP.HMAStrategy - Base Line
+"""
+
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
+# ╠═╡ disabled = true
+#=╠═╡
 # If it says "wtf", just run it again.
 # It mysteriously fails on the first try, but works afterward.
 r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
+  ╠═╡ =#
+
+# ╔═╡ 52d6a457-041f-47e8-b9d4-660bb202155d
+#=╠═╡
+visualize((r.chart_subject.charts[:trend], r.simulator_session); min_height=800)
+  ╠═╡ =#
+
+# ╔═╡ 5852651b-e16e-4f74-895c-9d85c5d122bf
+#=╠═╡
+df = TP.report(r.simulator_session)
+  ╠═╡ =#
+
+# ╔═╡ ee1cfab6-5b47-4997-862f-eeab49230308
+#=╠═╡
+# wins
+sum(filter(n -> n >= 0, df.pnl))
+  ╠═╡ =#
+
+# ╔═╡ 2cb4800f-4924-4760-9d13-e96cecd9968f
+#=╠═╡
+# losses
+sum(filter(n -> n < 0, df.pnl))
+  ╠═╡ =#
+
+# ╔═╡ 8bf26867-59b1-47c6-a7af-ff63f06dd9c5
+#=╠═╡
+# total
+sum(df.pnl)
+  ╠═╡ =#
 
 # ╔═╡ 98b2d2f6-d522-43f0-bbea-768176f210ef
 md"""
-# Results
+## HMA2Strategy
 """
 
-# ╔═╡ 52d6a457-041f-47e8-b9d4-660bb202155d
-visualize((r.chart_subject.charts[:trend], r.simulator_session); min_height=800)
-
-# ╔═╡ 5852651b-e16e-4f74-895c-9d85c5d122bf
-df = TP.report(r.simulator_session)
-
-# ╔═╡ b1ae01bb-8d9a-42aa-a353-915eb111b014
-wins = sum(filter(n -> n >= 0, df.pnl))
-
-# ╔═╡ e2efc24a-b379-476b-bda4-c619a805c4e4
-losses = sum(filter(n -> n < 0, df.pnl))
-
-# ╔═╡ 8bf26867-59b1-47c6-a7af-ff63f06dd9c5
-total = sum(df.pnl)
-
-# ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
-md"""
-# Libraries
-"""
-
-# ╔═╡ dbfea1b0-d616-416a-a7d3-e1d59121071d
-TableOfContents()
+# ╔═╡ 46c4e15a-89e7-4127-a48d-3caa7ea7a025
+r2 = TP.simulate(candle_observable, TP.PSA);
 
 # ╔═╡ 533cd39c-bde7-11ef-127b-c917240c6f66
 md"""
 # Local Libraries
 """
+
+# ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
+md"""
+# Other Libraries
+"""
+
+# ╔═╡ dbfea1b0-d616-416a-a7d3-e1d59121071d
+TableOfContents()
 
 # ╔═╡ f9600b7e-0772-4536-9959-1fc4e03cb6e6
 md"""
@@ -164,9 +286,6 @@ via CryptoMarketData.jl]
 	Diagram(src)
 end;
 
-# ╔═╡ fbdcdced-3b73-41a5-ae78-08c5b2f5f47f
-noml_fs
-
 # ╔═╡ db3b46c0-4f25-4a8e-ada2-00fad0e796d8
 md"""
 # CSS
@@ -198,6 +317,7 @@ Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 LightweightCharts = "d6998af1-87ca-4e7f-83d4-864c79a249fa"
 NomnomlJS = "05e5b401-cbd0-4511-9ee7-1ac7fa2205f5"
+OnlineTechnicalIndicators = "dc2d07fb-478f-4566-8417-81bb3e5a7af1"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 ReversedSeries = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
 Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
@@ -212,6 +332,7 @@ DataFrames = "~1.7.0"
 ExchangeOperations = "~0.0.1"
 LightweightCharts = "~2.3.0"
 NomnomlJS = "~0.2.0"
+OnlineTechnicalIndicators = "~0.1.0"
 PlutoUI = "~0.7.60"
 ReversedSeries = "~1.1.0"
 Revise = "~3.6.4"
@@ -226,7 +347,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "6e48e10f3688446d020c98223b2fd8ef59fe3d6c"
+project_hash = "0b373be795492c73bd17afcb22793124ace497ba"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -1284,31 +1405,42 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╟─14ee20f3-2742-41d7-b816-0bb2f143e226
-# ╠═fbdcdced-3b73-41a5-ae78-08c5b2f5f47f
+# ╟─5d6e8d7d-59a2-475a-a955-a065188d9c01
+# ╟─824d9b52-c6c6-4d7c-8775-a51f56eeda28
+# ╠═52d6a457-041f-47e8-b9d4-660bb202155d
+# ╠═5852651b-e16e-4f74-895c-9d85c5d122bf
+# ╠═ee1cfab6-5b47-4997-862f-eeab49230308
+# ╠═2cb4800f-4924-4760-9d13-e96cecd9968f
+# ╠═8bf26867-59b1-47c6-a7af-ff63f06dd9c5
 # ╟─38bd1675-650f-4276-becb-216f3da6b630
 # ╠═b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
 # ╠═5ef635f6-52b7-4660-beea-bfcd67d67131
 # ╠═ed9771c3-9937-4122-9d43-c41ea94db033
 # ╠═db7ee608-5c9c-40db-9ba8-40159219b95b
 # ╟─cd94145a-4946-443f-aefe-f578f3be7f24
+# ╟─95c40b88-a30a-4f39-bf1b-b8960d239339
 # ╠═84d40e0c-ccd2-4e19-9770-30c01a9d26fc
+# ╠═fb67c595-500a-43f8-9f06-b60226bae2c6
+# ╟─e1b9d946-f59a-4db4-b20f-9f4d0626f45c
+# ╠═45e75970-4627-4258-a1cd-a3cd028206b6
+# ╠═0856646f-565f-45bd-a17e-9eac33c82c73
+# ╠═001b7749-0a24-4461-9729-203a0e454c6b
+# ╠═8fddf9a0-cb7a-4bcb-bb0e-deb45877fef7
+# ╠═6791e328-8ba1-4299-beaf-abfd5cc64112
 # ╟─ef19c935-3270-46e3-97a0-8e874bb56643
+# ╟─f93d3f19-3893-4c61-b383-04e1394e79ea
 # ╠═d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
 # ╟─98b2d2f6-d522-43f0-bbea-768176f210ef
-# ╠═52d6a457-041f-47e8-b9d4-660bb202155d
-# ╠═5852651b-e16e-4f74-895c-9d85c5d122bf
-# ╠═b1ae01bb-8d9a-42aa-a353-915eb111b014
-# ╠═e2efc24a-b379-476b-bda4-c619a805c4e4
-# ╠═8bf26867-59b1-47c6-a7af-ff63f06dd9c5
-# ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
-# ╠═f3095108-14d2-492b-bff5-cd87395603a8
-# ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
+# ╠═46c4e15a-89e7-4127-a48d-3caa7ea7a025
 # ╟─533cd39c-bde7-11ef-127b-c917240c6f66
 # ╠═bfda450f-17ac-4455-8ba2-77f589da713e
 # ╠═89116502-bb8a-42e5-a75d-6b7559e54967
 # ╠═00babb13-07d0-43a3-a8c2-6e5d7af975af
 # ╠═214ba5cd-4215-4cda-8a7e-9659faa42818
 # ╠═318f5d44-f400-461d-bb13-34014d553268
+# ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
+# ╠═f3095108-14d2-492b-bff5-cd87395603a8
+# ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
 # ╟─f9600b7e-0772-4536-9959-1fc4e03cb6e6
 # ╠═73a83946-b67f-4b77-a58c-4c7bc30cffd3
 # ╟─db3b46c0-4f25-4a8e-ada2-00fad0e796d8

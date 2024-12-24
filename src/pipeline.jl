@@ -12,7 +12,7 @@
 
 # XXX: I'm so sorry.
 "`strategy_subject` is global so that the `include` of hsm_instance.jl works."
-global strategy_subject = nothing
+global strategy_subject
 
 "`simulate_sanity_check_failure_error` is a tuple filled with a lot of nothing values so that
 code that's @unpack'ing return values from `simulate()` don't crash."
@@ -45,9 +45,18 @@ julia> @unpack simulator_session, chart_subject = simulate(candle_observable, HM
 ```
 """
 function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; kwargs...)
+    (cs, ss) = load_strategy(strategy_type; kwargs...)
+    simulate_main(candle_observable, cs, ss)
+end
+
+function simulate(candle_observable, t::Tuple{ChartSubject, StrategySubject})
+    (cs, ss) = t
+    simulate_main(candle_observable, cs, ss)
+end
+
+function simulate_main(candle_observable, chart_subject, ss)
     candle_subject = Subject(Candle)
-    (chart_subject, strategy_subject) = load_strategy(strategy_type; kwargs...)
-    global strategy_subject = strategy_subject # XXX: FUUUUUUUU
+    global strategy_subject = ss # XXX: FUUUUUUUU
     src = dirname(@__FILE__)
     hsm = include("$(src)/hsm_instance.jl") # INFO: It worked.  If HSM gets a v2, I hope I can remove this.
     strategy_subject.hsm = hsm
