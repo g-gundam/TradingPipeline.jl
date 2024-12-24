@@ -46,7 +46,7 @@ julia> @unpack simulator_session, chart_subject = simulate(candle_observable, HM
 """
 function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; kwargs...)
     candle_subject = Subject(Candle)
-    (chart_subject, strategy_subject) = load_strategy(strategy_type)
+    (chart_subject, strategy_subject) = load_strategy(strategy_type; kwargs...)
     global strategy_subject = strategy_subject # XXX: FUUUUUUUU
     src = dirname(@__FILE__)
     hsm = include("$(src)/hsm_instance.jl") # INFO: It worked.  If HSM gets a v2, I hope I can remove this.
