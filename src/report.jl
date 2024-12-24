@@ -77,12 +77,25 @@ function TechnicalIndicatorCharts.visualize(t::Tuple{Chart, XO.AbstractSession})
         else
             index_of(row.exit_ts)
         end
+        line_color = if row.action == :long
+            if row.entry_price < row.exit_price
+                "#7CB518"
+            else
+                "#386641"
+            end
+        else
+            if row.entry_price > row.exit_price
+                "#FF3366"
+            else
+                "#3C0919"
+            end
+        end
         trade_marker = lwc_trend_line(
             index_of(row.entry_ts),
             row.entry_price,
             index2-1,
             row.exit_price;
-            line_color="#7CB518"
+            line_color
         )
         push!(stix.plugins, trade_marker)
     end
