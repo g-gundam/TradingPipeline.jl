@@ -58,5 +58,5 @@ using TradingPipeline: load_strategy, report
 
 candle_observable = df_candles_observable(btcusd1m)
 @unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
-df = report(simulator_session)
+rdf = report(simulator_session)
 =#
