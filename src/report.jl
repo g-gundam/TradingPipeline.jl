@@ -72,16 +72,16 @@ function TechnicalIndicatorCharts.visualize(t::Tuple{Chart, XO.AbstractSession})
     stix = cell11.charts[1]
     index_of = ts::DateTime -> find_index(chart.df.ts, t -> t >= ts)
     for row in eachrow(rdf)
-        index2 = if ismissing(index_of(row.close_ts))
+        index2 = if ismissing(index_of(row.exit_ts))
             lastindex(chart.df.ts)
         else
-            index_of(row.close_ts)
+            index_of(row.exit_ts)
         end
         trade_marker = lwc_trend_line(
-            index_of(row.open_ts),
-            row.open_price,
+            index_of(row.entry_ts),
+            row.entry_price,
             index2-1,
-            row.close_price;
+            row.exit_price;
             line_color="#7CB518"
         )
         push!(stix.plugins, trade_marker)
