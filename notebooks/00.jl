@@ -84,18 +84,6 @@ md"""
 
 # ╔═╡ 84d40e0c-ccd2-4e19-9770-30c01a9d26fc
 TP.HMAStrategy
-# I should instantiate it first and then pass it to simulate.
-# That'll simplify the API.
-
-# XXX
-# I remember why I can't do this.
-# I need to defer to load_strategy, because it knows how to setup charts and strategy together.
-# It could be different for every strategy, so I need to let it do its thing.
-# Maybe instead of 
-# simulate(observable, ::Type{AbstractStrategy}; kwargs) it becomes
-# simulate(observable, ::Type{AbstractStrategy}, strategy_opts=Dict())
-
-# I gotta play with it, and find something that works reliably.
 
 # ╔═╡ ef19c935-3270-46e3-97a0-8e874bb56643
 md"""
@@ -103,7 +91,9 @@ md"""
 """
 
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
-r = TP.simulate(candle_observable, TP.HMAStrategy);
+# If it says "wtf", just run it again.
+# It mysteriously fails on the first try, but works afterward.
+r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
 
 # ╔═╡ 98b2d2f6-d522-43f0-bbea-768176f210ef
 md"""
