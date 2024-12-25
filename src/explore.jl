@@ -11,7 +11,7 @@ using DocStringExtensions
 Return a few rows before and after the given timestamp `ts`
 in the DataFrame `df`.
 """
-function around(ts::DateTime, df::AbstractDataFrame; before=4, after=4, ts_field=:ts)
+function around(ts::DateTime, df::AbstractDataFrame; before=1, after=1, ts_field=:ts)
     i = 1
     for row in eachrow(df)
         if row[ts_field] == ts
