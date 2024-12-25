@@ -63,7 +63,7 @@ function simulate_main(candle_observable, chart_subject, ss)
     HSM.transition_to_state!(hsm, hsm)
     sanity_check = typeof(HSM.active_state(hsm))
     if sanity_check != TradingPipeline.Neutral
-        @error "wtf" sanity_check should_be=TradingPipeline.Neutral
+        @error "wtf" sanity_check should_be=TradingPipeline.Neutral solution="Try running it again.  Subsequent runs seem OK."
         return simulate_sanity_check_failure_error
         #return simulate(candle_observable, strategy_type; kwargs...) # XXX: It'll succeed the second time!
     end
