@@ -8,6 +8,7 @@
 ## What's going on?
 
 - A lot of this is Rocket.jl-related code that takes some of my other libraries and connects them together in a graph of async tasks.
+  + Thanks to **[Lucky.jl](https://github.com/oliviermilla/Lucky.jl)** for introducing me to [Rocket.jl](https://github.com/ReactiveBayes/Rocket.jl) in the first place.
 - Everything here is very tentative.
 - I've been feeling things out in the REPL, and I've finally gotten to the point where I may need to shift to Pluto notebooks.
 - I needed a way to load portions of my code into a notebook, and this package was created to facilitate that.
