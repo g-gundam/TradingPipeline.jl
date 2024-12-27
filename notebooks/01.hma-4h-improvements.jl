@@ -32,7 +32,7 @@ end
 # ╔═╡ 14ee20f3-2742-41d7-b816-0bb2f143e226
 md"""
 # 01 HMA 4h Improvements
-- I'm going to take the naive, long-only HMA cross strategy from 00.jl, and try to soften or eliminate some of its weak spots.
+- I'm going to take the naive, long-only HMA cross strategy, and try to soften or eliminate some of its weak spots.
 """
 
 # ╔═╡ 38bd1675-650f-4276-becb-216f3da6b630
@@ -95,13 +95,13 @@ md"""
 - There's nothing obviously terrible about the entry conditions.
 - Maybe this is a loss we take.
 
-### Trade 3:  Unintended consequences of late_entry code
+### Trade 3:  Unintended consequences of late entry code
 - This was a big win that turned into a small win due to the late entry criteria for trades 4 & 5.
 - To solve this, I added an alternate entry using an hma220/hma440 cross and a few other criteria for safer entry.
 
-### Trade 4 & 5:  Similar losses
+### Trade 4 & 5:  Similar losses due to late entry
 - I feel like these could have been turned into wins.
-- They're both what I would call late entries where the HMA cross happened way below the entry point.
+- They're both what I would call late entries where the 330/440 HMA cross happened way below the entry point.
 - HMA440 was very far from the close price at entry time.
 - They were also profitable for a while until they weren't.
 """
@@ -275,8 +275,8 @@ sum(rdf2.pnl)
 
 # ╔═╡ 05fe72c2-d0a2-4d67-81df-17908c29c3c4
 md"""
-### Trade 3 Improved
-- An earlier entry yielded an extra $4433.
+### Trade 3 Improved: Earlier entry
+- An earlier entry at a lower price yielded an extra $4433.
 """
 
 # ╔═╡ 871f3aaa-f334-4e26-9d89-2139fe8d5330
@@ -285,9 +285,12 @@ rdf[3, :]
 # ╔═╡ 8a39b6d5-2d25-40ab-b228-eaab4f563b96
 rdf2[3, :]
 
+# ╔═╡ a73d22d0-90cf-41c1-8d4c-999c438ef393
+rdf2[3, :pnl] - rdf[3, :pnl]
+
 # ╔═╡ 79bdc784-e3cf-4772-b11a-94bcc42e913d
 md"""
-### Trade 4 Improved: Small loss to decent win.
+### Trade 4 Improved: Small loss to decent win
 - Using the late-entry/early-exit criteria, a small loss was turned into a decent win.
 """
 
@@ -296,6 +299,9 @@ rdf[4, :]
 
 # ╔═╡ d18a6c22-c47f-47ff-af60-fd068e1aaa19
 rdf2[4, :]
+
+# ╔═╡ cdfdb1d0-c057-4246-bfe2-43d1cd72434e
+rdf2[4, :pnl] - rdf[4, :pnl]
 
 # ╔═╡ 4aa92651-1e2b-4c78-b330-5471cefd4e43
 md"""
@@ -309,9 +315,12 @@ rdf[5, :]
 # ╔═╡ ee115084-6f76-4b8e-abcd-680c927c6cb3
 rdf2[5, :]
 
+# ╔═╡ 34ce1751-53c5-4ea6-9fe2-d3c55a55d051
+rdf2[5, :pnl] - rdf[5, :pnl]
+
 # ╔═╡ 55ec5c0f-95a5-4729-85a5-003058eab3b4
 md"""
-### Trade 6 Eliminated
+### Trade 6 Eliminated: Big loss to no loss
 - A bad loss was easily avoided and turned into no loss.
 """
 
@@ -319,7 +328,7 @@ md"""
 rdf[6, :]
 
 # ╔═╡ ce85a7fb-d1bc-4734-8c40-55f838a00533
-0
+0 - rdf[6, :pnl]
 
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
@@ -1259,12 +1268,15 @@ version = "17.4.0+2"
 # ╟─05fe72c2-d0a2-4d67-81df-17908c29c3c4
 # ╠═871f3aaa-f334-4e26-9d89-2139fe8d5330
 # ╠═8a39b6d5-2d25-40ab-b228-eaab4f563b96
+# ╠═a73d22d0-90cf-41c1-8d4c-999c438ef393
 # ╟─79bdc784-e3cf-4772-b11a-94bcc42e913d
 # ╠═e0ec2d0f-709f-44ff-bfc9-117421ee91c1
 # ╠═d18a6c22-c47f-47ff-af60-fd068e1aaa19
+# ╠═cdfdb1d0-c057-4246-bfe2-43d1cd72434e
 # ╟─4aa92651-1e2b-4c78-b330-5471cefd4e43
 # ╠═7a7b3125-589e-44c0-aba2-47ac87809a3b
 # ╠═ee115084-6f76-4b8e-abcd-680c927c6cb3
+# ╠═34ce1751-53c5-4ea6-9fe2-d3c55a55d051
 # ╟─55ec5c0f-95a5-4729-85a5-003058eab3b4
 # ╠═4bef174a-558d-4ec0-9de0-9be1e3d42e53
 # ╠═ce85a7fb-d1bc-4734-8c40-55f838a00533
