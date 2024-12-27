@@ -4,34 +4,11 @@
 using Markdown
 using InteractiveUtils
 
-# ╔═╡ bfda450f-17ac-4455-8ba2-77f589da713e
-begin 
+# ╔═╡ c7a73aca-78f4-402d-8199-48e83affac95
+begin
 	push!(LOAD_PATH, "../Project.toml")
+	using TradingPipeline
 	import TradingPipeline as TP
-end
-
-# ╔═╡ 89116502-bb8a-42e5-a75d-6b7559e54967
-begin
-	push!(LOAD_PATH, "../../CryptoMarketData.jl/Project.toml")
-	using CryptoMarketData
-end
-
-# ╔═╡ 00babb13-07d0-43a3-a8c2-6e5d7af975af
-begin
-	push!(LOAD_PATH, "../../TechnicalIndicatorCharts.jl/Project.toml")
-	using TechnicalIndicatorCharts
-end
-
-# ╔═╡ 214ba5cd-4215-4cda-8a7e-9659faa42818
-begin
-	push!(LOAD_PATH, "../../ReversedSeries.jl/Project.toml")
-	using ReversedSeries
-end
-
-# ╔═╡ 318f5d44-f400-461d-bb13-34014d553268
-begin
-	push!(LOAD_PATH, "../../ExchangeOperations.jl/Project.toml")
-	import ExchangeOperations as XO
 end
 
 # ╔═╡ f3095108-14d2-492b-bff5-cd87395603a8
@@ -44,38 +21,18 @@ begin
 	using Chain
 	using UnPack
 	using LightweightCharts
-	using NomnomlJS
 	using OnlineTechnicalIndicators
+
+	using CryptoMarketData
+	using TechnicalIndicatorCharts
+	using ReversedSeries
+	using ExchangeOperations
 end
 
 # ╔═╡ 14ee20f3-2742-41d7-b816-0bb2f143e226
 md"""
 # 01 HMA 4h Improvements
 - I'm going to take the naive, long-only HMA cross strategy from 00.jl, and try to soften or eliminate some of its weak spots.
-"""
-
-# ╔═╡ 5d6e8d7d-59a2-475a-a955-a065188d9c01
-md"""
-## Base Line Results - TP.HMAStrategy
-- 4 wins / 4 losses
-"""
-
-# ╔═╡ 824d9b52-c6c6-4d7c-8775-a51f56eeda28
-md"""
-### Trade 2:  Should be avoided, but how?
-
-### Trade 4 & 5:  Similar losses
-- I feel like these could have been turned into wins.
-- They're both what I would call late entries where the HMA cross happened way below the entry point.
-- HMA55 is nearby and steep.
-- They were also profitable for a while until they weren't.
-
-#### Solution
-- Identify this as a late entry.
-- In the should_close_long function, if we're known to be in a late entry position, take profit quickly after a certain gain is achieved.
-  + Don't wait for the HMA cross, because it'll be too late.
-
-### Trade 6:  I think this can be avoided
 """
 
 # ╔═╡ 38bd1675-650f-4276-becb-216f3da6b630
@@ -95,44 +52,162 @@ btcusd1m = load(pancakeswap, "BTCUSD"; datadir, span=Date("2023-07-01"):Date("20
 # ╔═╡ db7ee608-5c9c-40db-9ba8-40159219b95b
 candle_observable = TP.df_candles_observable(btcusd1m)
 
-# ╔═╡ cd94145a-4946-443f-aefe-f578f3be7f24
+# ╔═╡ ef19c935-3270-46e3-97a0-8e874bb56643
 md"""
-# Strategy
-- In future notebooks, I intend to implement strategies directly in the notebook.
-- I think that'll let me iterate faster.
+# Simulator Sessions
 """
 
-# ╔═╡ 95c40b88-a30a-4f39-bf1b-b8960d239339
+# ╔═╡ f93d3f19-3893-4c61-b383-04e1394e79ea
 md"""
-## HMAStrategy - The Original
+## TP.HMAStrategy - Base Line
 """
 
-# ╔═╡ 84d40e0c-ccd2-4e19-9770-30c01a9d26fc
-TP.HMAStrategy
+# ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
+# If it says "wtf", just run it again.
+# It mysteriously fails on the first try, but works afterward.
+r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
 
-# ╔═╡ fb67c595-500a-43f8-9f06-b60226bae2c6
-x = 1
+# ╔═╡ 52d6a457-041f-47e8-b9d4-660bb202155d
+visualize((r.chart_subject.charts[:trend], r.simulator_session); min_height=800)
+
+# ╔═╡ 5852651b-e16e-4f74-895c-9d85c5d122bf
+rdf = TP.report(r.simulator_session)
+
+# ╔═╡ 357359d5-bb87-4f82-ad3c-0195ecc53d17
+rdf[4, :entry_ts]
+
+# ╔═╡ ee1cfab6-5b47-4997-862f-eeab49230308
+# wins
+sum(filter(n -> n >= 0, rdf.pnl))
+
+# ╔═╡ 2cb4800f-4924-4760-9d13-e96cecd9968f
+# losses
+sum(filter(n -> n < 0, rdf.pnl))
+
+# ╔═╡ 8bf26867-59b1-47c6-a7af-ff63f06dd9c5
+# total
+sum(rdf.pnl)
+
+# ╔═╡ 824d9b52-c6c6-4d7c-8775-a51f56eeda28
+md"""
+### Trade 2:  Should this be avoided?
+- It was a small loss.
+- There's nothing obviously terrible about the entry conditions.
+- Maybe this is a loss we take.
+
+### Trade 3:  Unintended consequences of late_entry code
+- This was a big win that turned into a small win due to the late entry criteria for trades 4 & 5.
+- To solve this, I added an alternate entry using an hma220/hma440 cross and a few other criteria for safer entry.
+
+### Trade 4 & 5:  Similar losses
+- I feel like these could have been turned into wins.
+- They're both what I would call late entries where the HMA cross happened way below the entry point.
+- HMA440 was very far from the close price at entry time.
+- They were also profitable for a while until they weren't.
+"""
+
+# ╔═╡ 5a5bc95b-5a79-4e41-8697-a263b2d88ddf
+t4 = around(rdf[4, :entry_ts], r.chart_subject[:trend].df)
+
+# ╔═╡ 85fbdd77-deed-4470-bbf4-917fd941f595
+t4high = around(DateTime("2024-05-21"), r.chart_subject[:trend].df)
+
+# ╔═╡ e1318a87-e181-442d-b4d0-49531be21ee3
+# This is the percentage increase of price from entry to a nearby peak.
+# Late entry needs an early exit.
+((t4high.h[2] - rdf[4, :entry_price]) / rdf[4, :entry_price]) * 100
+
+# ╔═╡ a618687b-a909-4057-8604-1cad820a867b
+t5 = TP.around(rdf[5, :entry_ts], r.chart_subject[:trend].df)
+
+# ╔═╡ 8ffaf850-2f06-4315-8793-84dd0d893f09
+md"""
+- Zooming in, I can see now that hma55 was not where I thought it was for trade 5.
+"""
+
+# ╔═╡ eeb6ec32-5ad3-4235-bbd8-0c6f47de0c08
+md"""
+### Trade 6:  I think this can be avoided
+- If price is under the 330 and 440 HMAs when the 330 crosses over the 440, don't open a long.
+- Also, maybe look at the slope of the 330 and 440 HMAs.
+  + Negative slopes are bad for long enry.
+"""
 
 # ╔═╡ e1b9d946-f59a-4db4-b20f-9f4d0626f45c
 md"""
-## PSA (Pluto Strategy A) - Taking Profit Sooner on Late Entries
+## HMA2Strategy - Taking Profit Sooner on Late Entries
 """
 
+# ╔═╡ e85c116e-acfb-468c-b087-499111d33be1
+@kwdef mutable struct HMA2Strategy <: TP.AbstractStrategy
+	chart::Chart
+	rf::ReversedFrame
+	is_late_entry::Bool = false
+	entry_price::Float64 = 0.0
+end
+
+# ╔═╡ fc6fd612-ab52-4298-b8f6-b4f1abb2525b
+function percent_diff(a, b)
+    ((b - a) / a) * 100
+end
+
+# ╔═╡ c852424f-0cc3-48e5-988b-5190f4d93001
+percent_diff(t5[2, :hma440], t5[2, :c])
+
+# ╔═╡ c149ff61-3df1-4ab1-b03f-563f456c88fc
+percent_diff(t4[2, :hma440], t4[2, :c])
+
 # ╔═╡ 45e75970-4627-4258-a1cd-a3cd028206b6
-function should_open_long(strategy::TP.PSA)
-    # if we're neutral and
-	@info "hi"
-    crossed_up(strategy.rf.hma330, strategy.rf.hma440)
+function TP.should_open_long(strategy::HMA2Strategy)
+    rf = strategy.rf
+	
+	# trade 3: try an alternate entry criteria so that it doesn't get classified as late
+	if (crossed_up(rf.hma220, rf.hma440)
+		&& rf.c[1] > rf.hma440[1]
+		&& positive_slope_currently(rf.hma330)
+	 	&& percent_diff(rf.hma440[1], rf.c[1]) < 3)
+		return true
+	end
+	
+    is_crossed = crossed_up(rf.hma330, rf.hma440)
+	if (is_crossed)
+		# trade 4 & 5: late entry criteria
+		if percent_diff(rf.hma440[1], rf.c[1]) > 8.5
+			strategy.is_late_entry = true
+			strategy.entry_price = rf.c[1]
+			@info :late_entry ts=rf.ts[1]
+		else
+			strategy.is_late_entry = false
+		end
+
+		# trade 6: avoid negative slope
+		if ismissing(rf.hma330[1])
+			return false
+		end
+		if rf.hma330[1] !== missing && rf.hma330[1] > rf.c[1] && negative_slope_currently(rf.hma330)
+			@info :negative_slope ts=rf.ts[1]
+			return false
+		end
+
+		# if we got this far, go long.
+		return true
+	else
+		return false
+	end
 end
 
 # ╔═╡ 0856646f-565f-45bd-a17e-9eac33c82c73
-function should_close_long(strategy::TP.PSA)
-    # if we're long and
-    crossed_down(strategy.rf.hma330, strategy.rf.hma440)
+function TP.should_close_long(strategy::HMA2Strategy)
+    rf = strategy.rf
+    if strategy.is_late_entry
+        return percent_diff(strategy.entry_price, rf.c[1]) > 6.0
+    else
+        crossed_down(strategy.rf.hma330, strategy.rf.hma440)
+    end
 end
 
 # ╔═╡ 001b7749-0a24-4461-9729-203a0e454c6b
-function load_strategy(::Type{TP.PSA}; symbol="BTCUSD", tf=Hour(4))
+function TP.load_strategy(::Type{HMA2Strategy}; symbol="BTCUSD", tf=Hour(4))
     hma_chart = Chart(
         symbol, tf,
         indicators = [
@@ -172,119 +247,92 @@ function load_strategy(::Type{TP.PSA}; symbol="BTCUSD", tf=Hour(4))
     )
     all_charts = Dict(:trend => hma_chart)
     chart_subject = TP.ChartSubject(charts=all_charts)
-    strategy = TP.PSA(chart=hma_chart, rf=ReversedFrame(hma_chart.df))
+    strategy = HMA2Strategy(chart=hma_chart, rf=ReversedFrame(hma_chart.df))
     strategy_subject = TP.StrategySubject(;strategy)
     return (chart_subject, strategy_subject)
 end
 
-# ╔═╡ 8fddf9a0-cb7a-4bcb-bb0e-deb45877fef7
-tppsa = TP.PSA(chart=Chart("a", Hour(1)))
-
-# ╔═╡ 6791e328-8ba1-4299-beaf-abfd5cc64112
-should_open_long(tppsa)
-
-# ╔═╡ ef19c935-3270-46e3-97a0-8e874bb56643
-md"""
-# Simulator Session
-"""
-
-# ╔═╡ f93d3f19-3893-4c61-b383-04e1394e79ea
-md"""
-## TP.HMAStrategy - Base Line
-"""
-
-# ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
-# ╠═╡ disabled = true
-#=╠═╡
-# If it says "wtf", just run it again.
-# It mysteriously fails on the first try, but works afterward.
-r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
-  ╠═╡ =#
-
-# ╔═╡ 52d6a457-041f-47e8-b9d4-660bb202155d
-#=╠═╡
-visualize((r.chart_subject.charts[:trend], r.simulator_session); min_height=800)
-  ╠═╡ =#
-
-# ╔═╡ 5852651b-e16e-4f74-895c-9d85c5d122bf
-#=╠═╡
-df = TP.report(r.simulator_session)
-  ╠═╡ =#
-
-# ╔═╡ ee1cfab6-5b47-4997-862f-eeab49230308
-#=╠═╡
-# wins
-sum(filter(n -> n >= 0, df.pnl))
-  ╠═╡ =#
-
-# ╔═╡ 2cb4800f-4924-4760-9d13-e96cecd9968f
-#=╠═╡
-# losses
-sum(filter(n -> n < 0, df.pnl))
-  ╠═╡ =#
-
-# ╔═╡ 8bf26867-59b1-47c6-a7af-ff63f06dd9c5
-#=╠═╡
-# total
-sum(df.pnl)
-  ╠═╡ =#
-
-# ╔═╡ 98b2d2f6-d522-43f0-bbea-768176f210ef
-md"""
-## HMA2Strategy
-"""
-
 # ╔═╡ 46c4e15a-89e7-4127-a48d-3caa7ea7a025
-r2 = TP.simulate(candle_observable, TP.PSA);
+r2 = TP.simulate(candle_observable, HMA2Strategy);
 
-# ╔═╡ 533cd39c-bde7-11ef-127b-c917240c6f66
+# ╔═╡ 7914d77b-d1e4-4862-a802-445f22230bac
+visualize((r2.chart_subject[:trend], r2.simulator_session); min_height=800)
+
+# ╔═╡ ba956630-8be2-408a-928a-bbe3b34dc5a3
+rdf2 = TP.report(r2.simulator_session)
+
+# ╔═╡ 09e9d23c-1bb0-4fc2-956d-918e8cb583e0
+# wins
+sum(filter(n -> n >= 0, rdf2.pnl))
+
+# ╔═╡ 70f1b5da-d433-4931-a10c-8fb77913bda0
+# losses
+sum(filter(n -> n < 0, rdf2.pnl))
+
+# ╔═╡ 385d4772-0255-4fe8-a43c-01fe2cd1f644
+# total
+sum(rdf2.pnl)
+
+# ╔═╡ 05fe72c2-d0a2-4d67-81df-17908c29c3c4
 md"""
-# Local Libraries
+### Trade 3 Improved
+- An earlier entry yielded an extra $4433.
 """
+
+# ╔═╡ 871f3aaa-f334-4e26-9d89-2139fe8d5330
+rdf[3, :]
+
+# ╔═╡ 8a39b6d5-2d25-40ab-b228-eaab4f563b96
+rdf2[3, :]
+
+# ╔═╡ 79bdc784-e3cf-4772-b11a-94bcc42e913d
+md"""
+### Trade 4 Improved: Small loss to decent win.
+- Using the late-entry/early-exit criteria, a small loss was turned into a decent win.
+"""
+
+# ╔═╡ e0ec2d0f-709f-44ff-bfc9-117421ee91c1
+rdf[4, :]
+
+# ╔═╡ d18a6c22-c47f-47ff-af60-fd068e1aaa19
+rdf2[4, :]
+
+# ╔═╡ 4aa92651-1e2b-4c78-b330-5471cefd4e43
+md"""
+### Trade 5 Improved: Big loss to decent win
+- The late-entry/early-exit criteria saved the trade.
+"""
+
+# ╔═╡ 7a7b3125-589e-44c0-aba2-47ac87809a3b
+rdf[5, :]
+
+# ╔═╡ ee115084-6f76-4b8e-abcd-680c927c6cb3
+rdf2[5, :]
+
+# ╔═╡ 55ec5c0f-95a5-4729-85a5-003058eab3b4
+md"""
+### Trade 6 Eliminated
+- A bad loss was easily avoided and turned into no loss.
+"""
+
+# ╔═╡ 4bef174a-558d-4ec0-9de0-9be1e3d42e53
+rdf[6, :]
+
+# ╔═╡ ce85a7fb-d1bc-4734-8c40-55f838a00533
+0
 
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
-# Other Libraries
+# Libraries
 """
 
 # ╔═╡ dbfea1b0-d616-416a-a7d3-e1d59121071d
-TableOfContents()
+TableOfContents(;depth=3)
 
-# ╔═╡ f9600b7e-0772-4536-9959-1fc4e03cb6e6
+# ╔═╡ 533cd39c-bde7-11ef-127b-c917240c6f66
 md"""
-# Diagrams
+## Local Libraries
 """
-
-# ╔═╡ 73a83946-b67f-4b77-a58c-4c7bc30cffd3
-noml_fs = begin
-	src = """
-[<frame> File System Layout |
-[g-gundam] -> [CryptoMarketData.jl | Provide candle data.]
-[g-gundam] -> [TechnicalIndicatorCharts.jl | Incrementally build charts 
-(with indicators)
-from candle data]
-[g-gundam] -> [ReversedSeries.jl | Looking at series in reverse
-makes it easier for me to
-write analysis functions.]
-[g-gundam] -> [ExchangeOperations.jl | My exchange simulator lives here.]
-[g-gundam] -> [TradingPipeline.jl | Use Rocket.jl to connect all the
-async pieces together.]
-[TradingPipeline.jl] -> [notebooks]
-[TradingPipeline.jl] -> [data]
-[notebooks] -> [<box> 00.jl | You are here! ]
-
-#.box: fill=#8f8
-[<box> 00.jl]
-
-[data |
-This can be a symlink
-to where you normally
-store the candles downloaded
-via CryptoMarketData.jl]
-]
-	"""
-	Diagram(src)
-end;
 
 # ╔═╡ db3b46c0-4f25-4a8e-ada2-00fad0e796d8
 md"""
@@ -295,15 +343,18 @@ md"""
 # https://discourse.julialang.org/t/cell-width-in-pluto-notebook/49761/11
 html"""
 <style>
-	@media screen {
-		main {
-			margin: 0 auto;
-			max-width: 2000px;
-    		padding-left: max(283px, 10%);
-    		padding-right: max(383px, 10%); 
-            # 383px to accomodate TableOfContents(aside=true)
-		}
-	}
+  @media screen {
+    main {
+      margin: 0 auto;
+      max-width: 2000px;
+        padding-left: max(283px, 10%);
+        padding-right: max(383px, 10%);
+        # 383px to accomodate TableOfContents(aside=true)
+    }
+    .plutoui-toc.aside {
+      width: min(80vw, 400px)
+    }
+  }
 </style>
 """
 
@@ -316,7 +367,6 @@ DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 LightweightCharts = "d6998af1-87ca-4e7f-83d4-864c79a249fa"
-NomnomlJS = "05e5b401-cbd0-4511-9ee7-1ac7fa2205f5"
 OnlineTechnicalIndicators = "dc2d07fb-478f-4566-8417-81bb3e5a7af1"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 ReversedSeries = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
@@ -331,13 +381,12 @@ CryptoMarketData = "~1.0.5"
 DataFrames = "~1.7.0"
 ExchangeOperations = "~0.0.1"
 LightweightCharts = "~2.3.0"
-NomnomlJS = "~0.2.0"
 OnlineTechnicalIndicators = "~0.1.0"
 PlutoUI = "~0.7.60"
-ReversedSeries = "~1.1.0"
+ReversedSeries = "~1.1.1"
 Revise = "~3.6.4"
 Rocket = "~1.8.1"
-TechnicalIndicatorCharts = "~0.6.0"
+TechnicalIndicatorCharts = "~0.6.1"
 UnPack = "~1.0.2"
 """
 
@@ -347,7 +396,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "0b373be795492c73bd17afcb22793124ace497ba"
+project_hash = "e9d031611757033ef19297aead99e69df4335457"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -383,23 +432,11 @@ git-tree-sha1 = "0691e34b3bb8be9307330f88d1a3c3f25466c24d"
 uuid = "d1d4a3ce-64b1-5f1a-9ba4-7e7e69966f35"
 version = "0.1.9"
 
-[[deps.Bzip2_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "8873e196c2eb87962a2048b3b8e08946535864a1"
-uuid = "6e34b625-4abd-537c-b88f-471c36dfa7a0"
-version = "1.0.8+2"
-
 [[deps.CSV]]
 deps = ["CodecZlib", "Dates", "FilePathsBase", "InlineStrings", "Mmap", "Parsers", "PooledArrays", "PrecompileTools", "SentinelArrays", "Tables", "Unicode", "WeakRefStrings", "WorkerUtilities"]
 git-tree-sha1 = "deddd8725e5e1cc49ee205a1964256043720a6c3"
 uuid = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
 version = "0.10.15"
-
-[[deps.Cairo_jll]]
-deps = ["Artifacts", "Bzip2_jll", "CompilerSupportLibraries_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "JLLWrappers", "LZO_jll", "Libdl", "Pixman_jll", "Xorg_libXext_jll", "Xorg_libXrender_jll", "Zlib_jll", "libpng_jll"]
-git-tree-sha1 = "009060c9a6168704143100f36ab08f06c2af4642"
-uuid = "83423d85-b0ee-5818-9007-b63ccbeb887a"
-version = "1.18.2+1"
 
 [[deps.Chain]]
 git-tree-sha1 = "9ae9be75ad8ad9d26395bf625dea9beac6d519f1"
@@ -522,12 +559,6 @@ git-tree-sha1 = "538c5ba61d62ebbf71d2d9cf1e8cb63c7d50f266"
 uuid = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 version = "0.0.1"
 
-[[deps.Expat_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "e51db81749b0777b2147fbe7b783ee79045b8e99"
-uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
-version = "2.6.4+1"
-
 [[deps.ExprTools]]
 git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
 uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
@@ -560,58 +591,16 @@ git-tree-sha1 = "05882d6995ae5c12bb5f36dd2ed3f61c98cbb172"
 uuid = "53c48c17-4a7d-5ca2-90c5-79b7896eea93"
 version = "0.8.5"
 
-[[deps.Fontconfig_jll]]
-deps = ["Artifacts", "Bzip2_jll", "Expat_jll", "FreeType2_jll", "JLLWrappers", "Libdl", "Libuuid_jll", "Zlib_jll"]
-git-tree-sha1 = "21fac3c77d7b5a9fc03b0ec503aa1a6392c34d2b"
-uuid = "a3f928ae-7b40-5064-980b-68af3947d34b"
-version = "2.15.0+0"
-
-[[deps.FreeType2_jll]]
-deps = ["Artifacts", "Bzip2_jll", "JLLWrappers", "Libdl", "Zlib_jll"]
-git-tree-sha1 = "786e968a8d2fb167f2e4880baba62e0e26bd8e4e"
-uuid = "d7e528f0-a631-5988-bf34-fe36492bcfd7"
-version = "2.13.3+1"
-
-[[deps.FriBidi_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "846f7026a9decf3679419122b49f8a1fdb48d2d5"
-uuid = "559328eb-81f9-559d-9380-de523a88c83c"
-version = "1.0.16+0"
-
 [[deps.Future]]
 deps = ["Random"]
 uuid = "9fa8497b-333b-5362-9e8d-4d0656e87820"
 version = "1.11.0"
-
-[[deps.Gettext_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "Libiconv_jll", "Pkg", "XML2_jll"]
-git-tree-sha1 = "9b02998aba7bf074d14de89f9d37ca24a1a0b046"
-uuid = "78b55507-aeef-58d4-861c-77aaff3498b1"
-version = "0.21.0+0"
-
-[[deps.Glib_jll]]
-deps = ["Artifacts", "Gettext_jll", "JLLWrappers", "Libdl", "Libffi_jll", "Libiconv_jll", "Libmount_jll", "PCRE2_jll", "Zlib_jll"]
-git-tree-sha1 = "b0036b392358c80d2d2124746c2bf3d48d457938"
-uuid = "7746bdde-850d-59dc-9ae8-88ece973131d"
-version = "2.82.4+0"
-
-[[deps.Graphite2_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "01979f9b37367603e2848ea225918a3b3861b606"
-uuid = "3b182d85-2403-5c21-9c21-1e1f0cc25472"
-version = "1.3.14+1"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
 git-tree-sha1 = "c67b33b085f6e2faf8bf79a61962e7339a81129c"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
 version = "1.10.15"
-
-[[deps.HarfBuzz_jll]]
-deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "Glib_jll", "Graphite2_jll", "JLLWrappers", "Libdl", "Libffi_jll"]
-git-tree-sha1 = "55c53be97790242c29031e5cd45e8ac296dadda3"
-uuid = "2e76f6c2-a576-52d4-95c1-20adfe4de566"
-version = "8.5.0+0"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
@@ -666,9 +655,9 @@ version = "1.0.0"
 
 [[deps.JLLWrappers]]
 deps = ["Artifacts", "Preferences"]
-git-tree-sha1 = "be3dc50a92e5a386872a493a10050136d4703f9b"
+git-tree-sha1 = "a007feb38b422fbdab534406aeca1b86823cb4d6"
 uuid = "692b3bcd-3c85-4b1f-b108-f13ce0eb3210"
-version = "1.6.1"
+version = "1.7.0"
 
 [[deps.JSON]]
 deps = ["Dates", "Mmap", "Parsers", "Unicode"]
@@ -688,35 +677,11 @@ version = "1.14.1"
     [deps.JSON3.weakdeps]
     ArrowTypes = "31f734f8-188a-4ce0-8406-c8a06bd891cd"
 
-[[deps.JpegTurbo_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "ef10afc9f4b942bcd75f4c3bc9d9e8d802944c23"
-uuid = "aacddb02-875f-59d6-b918-886e6ef4fbf8"
-version = "3.1.0+0"
-
 [[deps.JuliaInterpreter]]
 deps = ["CodeTracking", "InteractiveUtils", "Random", "UUIDs"]
 git-tree-sha1 = "10da5154188682e5c0726823c2b5125957ec3778"
 uuid = "aa1ae85d-cabe-5617-a682-6adf51b2e16a"
 version = "0.9.38"
-
-[[deps.LERC_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "4ec1e8fac04150b570e315baaa68950e368a803d"
-uuid = "88015f11-f218-50d7-93a8-a6af411a945d"
-version = "4.0.0+1"
-
-[[deps.LLVMOpenMP_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "78211fb6cbc872f77cad3fc0b6cf647d923f4929"
-uuid = "1d63c593-3942-5779-bab2-d838dc0a180e"
-version = "18.1.7+0"
-
-[[deps.LZO_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "854a9c268c43b77b0a27f22d7fab8d33cdb3a731"
-uuid = "dd4b983a-f0e5-5f8d-a1b7-129d4a5fb1ac"
-version = "2.10.2+1"
 
 [[deps.LaTeXStrings]]
 git-tree-sha1 = "dda21b8cbd6a6c40d9d02a73230f9d70fed6918c"
@@ -752,53 +717,11 @@ version = "1.11.0+1"
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 version = "1.11.0"
 
-[[deps.Libffi_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
-git-tree-sha1 = "27ecae93dd25ee0909666e6835051dd684cc035e"
-uuid = "e9f186c6-92d2-5b65-8a66-fee21dc1b490"
-version = "3.2.2+2"
-
-[[deps.Libgcrypt_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgpg_error_jll"]
-git-tree-sha1 = "8be878062e0ffa2c3f67bb58a595375eda5de80b"
-uuid = "d4300ac3-e22c-5743-9152-c294e39db1e4"
-version = "1.11.0+0"
-
-[[deps.Libgpg_error_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "a7f43994b47130e4f491c3b2dbe78fe9e2aed2b3"
-uuid = "7add5ba3-2f88-524e-9cd5-f83b8a55f7b8"
-version = "1.51.0+0"
-
 [[deps.Libiconv_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "61dfdba58e585066d8bce214c5a51eaa0539f269"
 uuid = "94ce4f54-9a6c-5748-9c1c-f9c7231a4531"
 version = "1.17.0+1"
-
-[[deps.Libmount_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "84eef7acd508ee5b3e956a2ae51b05024181dee0"
-uuid = "4b2f31a3-9ecc-558c-b454-b3730dcb73e9"
-version = "2.40.2+0"
-
-[[deps.Librsvg_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Pango_jll", "Pkg", "gdk_pixbuf_jll"]
-git-tree-sha1 = "ae0923dab7324e6bc980834f709c4cd83dd797ed"
-uuid = "925c91fb-5dd6-59dd-8e8c-345e74382d89"
-version = "2.54.5+0"
-
-[[deps.Libtiff_jll]]
-deps = ["Artifacts", "JLLWrappers", "JpegTurbo_jll", "LERC_jll", "Libdl", "XZ_jll", "Zlib_jll", "Zstd_jll"]
-git-tree-sha1 = "b404131d06f7886402758c9ce2214b636eb4d54a"
-uuid = "89763e89-9b03-5906-acba-b20f662cd828"
-version = "4.7.0+0"
-
-[[deps.Libuuid_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "edbf5309f9ddf1cab25afc344b1e8150b7c832f9"
-uuid = "38a345b3-de98-5d2b-a5d3-14cd9215e700"
-version = "2.40.2+0"
 
 [[deps.LightweightCharts]]
 deps = ["Dates", "NanoDates", "Serde"]
@@ -900,18 +823,6 @@ version = "1.0.3"
 uuid = "ca575930-c2e3-43a9-ace4-1e988b2c1908"
 version = "1.2.0"
 
-[[deps.NodeJS]]
-deps = ["Pkg"]
-git-tree-sha1 = "bf1f49fd62754064bc42490a8ddc2aa3694a8e7a"
-uuid = "2bd173c7-0d6d-553b-b6af-13a54713934c"
-version = "2.0.0"
-
-[[deps.NomnomlJS]]
-deps = ["Artifacts", "Librsvg_jll", "NodeJS"]
-git-tree-sha1 = "1b65289e27abd3fec2d2a0dab299d70f4c933e55"
-uuid = "05e5b401-cbd0-4511-9ee7-1ac7fa2205f5"
-version = "0.2.0"
-
 [[deps.Nullables]]
 git-tree-sha1 = "8f87854cc8f3685a60689d8edecaa29d2251979b"
 uuid = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
@@ -942,37 +853,20 @@ version = "1.4.3"
 
 [[deps.OpenSSL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "7493f61f55a6cce7325f197443aa80d32554ba10"
+git-tree-sha1 = "f58782a883ecbf9fb48dcd363f9ccd65f36c23a8"
 uuid = "458c3c95-2e84-50aa-8efc-19380b2a3a95"
-version = "3.0.15+1"
+version = "3.0.15+2"
 
 [[deps.OrderedCollections]]
 git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.7.0"
 
-[[deps.PCRE2_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "efcefdf7-47ab-520b-bdef-62a2eaa19f15"
-version = "10.42.0+1"
-
-[[deps.Pango_jll]]
-deps = ["Artifacts", "Cairo_jll", "Fontconfig_jll", "FreeType2_jll", "FriBidi_jll", "Glib_jll", "HarfBuzz_jll", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "ed6834e95bd326c52d5675b4181386dfbe885afb"
-uuid = "36c8627f-9965-5494-a995-c6b170f724f3"
-version = "1.55.5+0"
-
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
 git-tree-sha1 = "8489905bcdbcfac64d1daa51ca07c0d8f0283821"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
 version = "2.8.1"
-
-[[deps.Pixman_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "LLVMOpenMP_jll", "Libdl"]
-git-tree-sha1 = "35621f10a7531bc8fa58f74610b1bfb70a3cfc6b"
-uuid = "30392449-352a-5448-841d-b1acce4e97dc"
-version = "0.43.4+0"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "FileWatching", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "Random", "SHA", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -1052,9 +946,9 @@ version = "1.3.0"
 
 [[deps.ReversedSeries]]
 deps = ["Chain", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "TidyTest"]
-git-tree-sha1 = "252a9174bf5daec5d99b31d3c941b95e2d658a3d"
+git-tree-sha1 = "6fd19670d521479db2b3f76b4a066b72c4582146"
 uuid = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
-version = "1.1.0"
+version = "1.1.1"
 
 [[deps.Revise]]
 deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "REPL", "Requires", "UUIDs", "Unicode"]
@@ -1198,10 +1092,10 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
 
 [[deps.TechnicalIndicatorCharts]]
-deps = ["Chain", "DataFrames", "DataFramesMeta", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "f349180d0ef733fdbca850c801fd2cd40e61e041"
+deps = ["Chain", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
+git-tree-sha1 = "10378437c3eb164256f573773441e81e23ddd138"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.0"
+version = "0.6.1"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -1298,66 +1192,6 @@ git-tree-sha1 = "a2fccc6559132927d4c5dc183e3e01048c6dcbd6"
 uuid = "02c8fc9c-b97f-50b9-bbe4-9be30ff0a78a"
 version = "2.13.5+0"
 
-[[deps.XSLT_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Libgcrypt_jll", "Libgpg_error_jll", "Libiconv_jll", "XML2_jll", "Zlib_jll"]
-git-tree-sha1 = "7d1671acbe47ac88e981868a078bd6b4e27c5191"
-uuid = "aed1982a-8fda-507f-9586-7b0439959a61"
-version = "1.1.42+0"
-
-[[deps.XZ_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "15e637a697345f6743674f1322beefbc5dcd5cfc"
-uuid = "ffd25f8a-64ca-5728-b0f7-c24cf3aae800"
-version = "5.6.3+0"
-
-[[deps.Xorg_libX11_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libxcb_jll", "Xorg_xtrans_jll"]
-git-tree-sha1 = "9dafcee1d24c4f024e7edc92603cedba72118283"
-uuid = "4f6342f7-b3d2-589e-9d20-edeb45f2b2bc"
-version = "1.8.6+1"
-
-[[deps.Xorg_libXau_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "2b0e27d52ec9d8d483e2ca0b72b3cb1a8df5c27a"
-uuid = "0c0b7dd1-d40b-584c-a123-a41640f87eec"
-version = "1.0.11+1"
-
-[[deps.Xorg_libXdmcp_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "02054ee01980c90297412e4c809c8694d7323af3"
-uuid = "a3789734-cfe1-5b06-b2d0-1dd0d9d62d05"
-version = "1.1.4+1"
-
-[[deps.Xorg_libXext_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
-git-tree-sha1 = "d7155fea91a4123ef59f42c4afb5ab3b4ca95058"
-uuid = "1082639a-0dae-5f34-9b06-72781eeb8cb3"
-version = "1.3.6+1"
-
-[[deps.Xorg_libXrender_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Xorg_libX11_jll"]
-git-tree-sha1 = "a490c6212a0e90d2d55111ac956f7c4fa9c277a6"
-uuid = "ea2f1a96-1ddc-540d-b46f-429655e07cfa"
-version = "0.9.11+1"
-
-[[deps.Xorg_libpthread_stubs_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "fee57a273563e273f0f53275101cd41a8153517a"
-uuid = "14d82f49-176c-5ed1-bb49-ad3f5cbd8c74"
-version = "0.1.1+1"
-
-[[deps.Xorg_libxcb_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "XSLT_jll", "Xorg_libXau_jll", "Xorg_libXdmcp_jll", "Xorg_libpthread_stubs_jll"]
-git-tree-sha1 = "1a74296303b6524a0472a8cb12d3d87a78eb3612"
-uuid = "c7cfdc94-dc32-55de-ac96-5a1b8d977c5b"
-version = "1.17.0+1"
-
-[[deps.Xorg_xtrans_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "b9ead2d2bdb27330545eb14234a2e300da61232e"
-uuid = "c5fb5394-a638-5e4d-96e5-b29de1b5cf10"
-version = "1.5.0+1"
-
 [[deps.YAML]]
 deps = ["Base64", "Dates", "Printf", "StringEncodings"]
 git-tree-sha1 = "dea63ff72079443240fbd013ba006bcbc8a9ac00"
@@ -1369,28 +1203,10 @@ deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 version = "1.2.13+1"
 
-[[deps.Zstd_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl"]
-git-tree-sha1 = "555d1076590a6cc2fdee2ef1469451f872d8b41b"
-uuid = "3161d3a3-bdf6-5164-811a-617609db77b4"
-version = "1.5.6+1"
-
-[[deps.gdk_pixbuf_jll]]
-deps = ["Artifacts", "Glib_jll", "JLLWrappers", "JpegTurbo_jll", "Libdl", "Libtiff_jll", "Xorg_libX11_jll", "libpng_jll"]
-git-tree-sha1 = "cc803af2e0d7647ae880e7eaf4be491094def6c7"
-uuid = "da03df04-f53b-5353-a52f-6a8b0620ced0"
-version = "2.42.12+0"
-
 [[deps.libblastrampoline_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
 version = "5.11.0+0"
-
-[[deps.libpng_jll]]
-deps = ["Artifacts", "JLLWrappers", "Libdl", "Zlib_jll"]
-git-tree-sha1 = "b70c870239dc3d7bc094eb2d6be9b73d27bef280"
-uuid = "b53b4c65-9356-5827-b1ea-8c7a1a84506f"
-version = "1.6.44+0"
 
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
@@ -1405,44 +1221,58 @@ version = "17.4.0+2"
 
 # ╔═╡ Cell order:
 # ╟─14ee20f3-2742-41d7-b816-0bb2f143e226
-# ╟─5d6e8d7d-59a2-475a-a955-a065188d9c01
-# ╟─824d9b52-c6c6-4d7c-8775-a51f56eeda28
-# ╠═52d6a457-041f-47e8-b9d4-660bb202155d
-# ╠═5852651b-e16e-4f74-895c-9d85c5d122bf
-# ╠═ee1cfab6-5b47-4997-862f-eeab49230308
-# ╠═2cb4800f-4924-4760-9d13-e96cecd9968f
-# ╠═8bf26867-59b1-47c6-a7af-ff63f06dd9c5
 # ╟─38bd1675-650f-4276-becb-216f3da6b630
 # ╠═b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
 # ╠═5ef635f6-52b7-4660-beea-bfcd67d67131
 # ╠═ed9771c3-9937-4122-9d43-c41ea94db033
 # ╠═db7ee608-5c9c-40db-9ba8-40159219b95b
-# ╟─cd94145a-4946-443f-aefe-f578f3be7f24
-# ╟─95c40b88-a30a-4f39-bf1b-b8960d239339
-# ╠═84d40e0c-ccd2-4e19-9770-30c01a9d26fc
-# ╠═fb67c595-500a-43f8-9f06-b60226bae2c6
-# ╟─e1b9d946-f59a-4db4-b20f-9f4d0626f45c
-# ╠═45e75970-4627-4258-a1cd-a3cd028206b6
-# ╠═0856646f-565f-45bd-a17e-9eac33c82c73
-# ╠═001b7749-0a24-4461-9729-203a0e454c6b
-# ╠═8fddf9a0-cb7a-4bcb-bb0e-deb45877fef7
-# ╠═6791e328-8ba1-4299-beaf-abfd5cc64112
 # ╟─ef19c935-3270-46e3-97a0-8e874bb56643
 # ╟─f93d3f19-3893-4c61-b383-04e1394e79ea
 # ╠═d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
-# ╟─98b2d2f6-d522-43f0-bbea-768176f210ef
+# ╠═52d6a457-041f-47e8-b9d4-660bb202155d
+# ╠═5852651b-e16e-4f74-895c-9d85c5d122bf
+# ╠═357359d5-bb87-4f82-ad3c-0195ecc53d17
+# ╠═ee1cfab6-5b47-4997-862f-eeab49230308
+# ╠═2cb4800f-4924-4760-9d13-e96cecd9968f
+# ╠═8bf26867-59b1-47c6-a7af-ff63f06dd9c5
+# ╟─824d9b52-c6c6-4d7c-8775-a51f56eeda28
+# ╠═5a5bc95b-5a79-4e41-8697-a263b2d88ddf
+# ╠═85fbdd77-deed-4470-bbf4-917fd941f595
+# ╠═e1318a87-e181-442d-b4d0-49531be21ee3
+# ╠═a618687b-a909-4057-8604-1cad820a867b
+# ╟─8ffaf850-2f06-4315-8793-84dd0d893f09
+# ╠═c852424f-0cc3-48e5-988b-5190f4d93001
+# ╠═c149ff61-3df1-4ab1-b03f-563f456c88fc
+# ╟─eeb6ec32-5ad3-4235-bbd8-0c6f47de0c08
+# ╟─e1b9d946-f59a-4db4-b20f-9f4d0626f45c
+# ╟─e85c116e-acfb-468c-b087-499111d33be1
+# ╟─fc6fd612-ab52-4298-b8f6-b4f1abb2525b
+# ╠═45e75970-4627-4258-a1cd-a3cd028206b6
+# ╠═0856646f-565f-45bd-a17e-9eac33c82c73
+# ╠═001b7749-0a24-4461-9729-203a0e454c6b
 # ╠═46c4e15a-89e7-4127-a48d-3caa7ea7a025
-# ╟─533cd39c-bde7-11ef-127b-c917240c6f66
-# ╠═bfda450f-17ac-4455-8ba2-77f589da713e
-# ╠═89116502-bb8a-42e5-a75d-6b7559e54967
-# ╠═00babb13-07d0-43a3-a8c2-6e5d7af975af
-# ╠═214ba5cd-4215-4cda-8a7e-9659faa42818
-# ╠═318f5d44-f400-461d-bb13-34014d553268
+# ╠═7914d77b-d1e4-4862-a802-445f22230bac
+# ╠═ba956630-8be2-408a-928a-bbe3b34dc5a3
+# ╠═09e9d23c-1bb0-4fc2-956d-918e8cb583e0
+# ╠═70f1b5da-d433-4931-a10c-8fb77913bda0
+# ╠═385d4772-0255-4fe8-a43c-01fe2cd1f644
+# ╟─05fe72c2-d0a2-4d67-81df-17908c29c3c4
+# ╠═871f3aaa-f334-4e26-9d89-2139fe8d5330
+# ╠═8a39b6d5-2d25-40ab-b228-eaab4f563b96
+# ╟─79bdc784-e3cf-4772-b11a-94bcc42e913d
+# ╠═e0ec2d0f-709f-44ff-bfc9-117421ee91c1
+# ╠═d18a6c22-c47f-47ff-af60-fd068e1aaa19
+# ╟─4aa92651-1e2b-4c78-b330-5471cefd4e43
+# ╠═7a7b3125-589e-44c0-aba2-47ac87809a3b
+# ╠═ee115084-6f76-4b8e-abcd-680c927c6cb3
+# ╟─55ec5c0f-95a5-4729-85a5-003058eab3b4
+# ╠═4bef174a-558d-4ec0-9de0-9be1e3d42e53
+# ╠═ce85a7fb-d1bc-4734-8c40-55f838a00533
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
 # ╠═f3095108-14d2-492b-bff5-cd87395603a8
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
-# ╟─f9600b7e-0772-4536-9959-1fc4e03cb6e6
-# ╠═73a83946-b67f-4b77-a58c-4c7bc30cffd3
+# ╟─533cd39c-bde7-11ef-127b-c917240c6f66
+# ╠═c7a73aca-78f4-402d-8199-48e83affac95
 # ╟─db3b46c0-4f25-4a8e-ada2-00fad0e796d8
 # ╠═ab4805a4-1482-4531-90d2-b8ef0741c026
 # ╟─00000000-0000-0000-0000-000000000001
