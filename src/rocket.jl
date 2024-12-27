@@ -80,17 +80,17 @@ abstract type AbstractManualCommand end # I haven't used these yet.
 struct ManualPause <: AbstractManualCommand end
 struct ManualResume <: AbstractManualCommand end
 
-"""
-TradeDecision was created with @enumx to define the 4 messages that can be emitted by a StrategySubject.
+# """
+# TradeDecision was created with @enumx to define the 4 messages that can be emitted by a StrategySubject.
 
-- Long
-- CloseLong
-- Short
-- CloseShort
+# - Long
+# - CloseLong
+# - Short
+# - CloseShort
 
-These requests are typically sent by a StrategySubject to an ExchangeDriver that will interpret them and
-perform concrete operations through an exchange API to open or close a position.
-"""
+# These requests are typically sent by a StrategySubject to an ExchangeDriver that will interpret them and
+# perform concrete operations through an exchange API to open or close a position.
+# """
 @enumx TradeDecision begin
     Long
     CloseLong
@@ -98,16 +98,16 @@ perform concrete operations through an exchange API to open or close a position.
     CloseShort
 end
 
-"""
-StrategySubjectMode was created with @enumx to define 3 modes of operation for the StrategySubject
+# """
+# StrategySubjectMode was created with @enumx to define 3 modes of operation for the StrategySubject
 
-- Normal
-- LongOnly
-- ShortOnly
+# - Normal
+# - LongOnly
+# - ShortOnly
 
-This makes it so that a new strategy doesn't have to be implemented if I wanted to test an existing
-strategy in a long-only or short-only way.
-"""
+# This makes it so that a new strategy doesn't have to be implemented if I wanted to test an existing
+# strategy in a long-only or short-only way.
+# """
 @enumx StrategySubjectMode begin
     Normal
     LongOnly
