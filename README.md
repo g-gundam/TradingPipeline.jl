@@ -8,6 +8,9 @@
 
 - A lot of this is Rocket.jl-related code that takes some of my other libraries and connects them together in a graph of async tasks.
   + Thanks to **[Lucky.jl](https://github.com/oliviermilla/Lucky.jl)** for introducing me to [Rocket.jl](https://github.com/ReactiveBayes/Rocket.jl) in the first place.
+  + I liked how backtesting and live trading could be accomplished with very similar code.
+  + I also saw how I could structure the feedback loop of events from the exchange back into the strategy.
+    - I was stuck on this for a long time.
 - Everything here is very tentative.
 - I've been feeling things out in the REPL, and I've finally gotten to the point where I may need to shift to Pluto notebooks.
 - I needed a way to load portions of my code into a notebook, and this package was created to facilitate that.
