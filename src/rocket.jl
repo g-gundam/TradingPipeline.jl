@@ -43,7 +43,7 @@ function Rocket.on_next!(subject::ChartSubject, c::Candle)
 end
 
 function Rocket.on_complete!(subject::ChartSubject)
-    @info :complete message=typeof(subject) revise="please!!!!"
+    @info :complete message=typeof(subject)
 end
 
 function Base.getindex(subject::ChartSubject, k::Symbol)
