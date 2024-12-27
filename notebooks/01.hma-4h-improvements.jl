@@ -63,8 +63,6 @@ md"""
 """
 
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
-# If it says "wtf", just run it again.
-# It mysteriously fails on the first try, but works afterward.
 r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
 
 # ╔═╡ 52d6a457-041f-47e8-b9d4-660bb202155d
@@ -160,12 +158,17 @@ percent_diff(t4[2, :hma440], t4[2, :c])
 # ╔═╡ 45e75970-4627-4258-a1cd-a3cd028206b6
 function TP.should_open_long(strategy::HMA2Strategy)
     rf = strategy.rf
+	# Don't trade until numeric values for hma440 exist.
+	if ismissing(rf.hma440[1])
+		return false
+	end
 	
 	# trade 3: try an alternate entry criteria so that it doesn't get classified as late
 	if (crossed_up(rf.hma220, rf.hma440)
 		&& rf.c[1] > rf.hma440[1]
 		&& positive_slope_currently(rf.hma330)
 	 	&& percent_diff(rf.hma440[1], rf.c[1]) < 3)
+		@info :early_entry ts=rf.ts[1]
 		return true
 	end
 	
@@ -181,9 +184,6 @@ function TP.should_open_long(strategy::HMA2Strategy)
 		end
 
 		# trade 6: avoid negative slope
-		if ismissing(rf.hma330[1])
-			return false
-		end
 		if rf.hma330[1] !== missing && rf.hma330[1] > rf.c[1] && negative_slope_currently(rf.hma330)
 			@info :negative_slope ts=rf.ts[1]
 			return false
@@ -285,9 +285,6 @@ rdf[3, :]
 # ╔═╡ 8a39b6d5-2d25-40ab-b228-eaab4f563b96
 rdf2[3, :]
 
-# ╔═╡ a73d22d0-90cf-41c1-8d4c-999c438ef393
-rdf2[3, :pnl] - rdf[3, :pnl]
-
 # ╔═╡ 79bdc784-e3cf-4772-b11a-94bcc42e913d
 md"""
 ### Trade 4 Improved: Small loss to decent win
@@ -299,9 +296,6 @@ rdf[4, :]
 
 # ╔═╡ d18a6c22-c47f-47ff-af60-fd068e1aaa19
 rdf2[4, :]
-
-# ╔═╡ cdfdb1d0-c057-4246-bfe2-43d1cd72434e
-rdf2[4, :pnl] - rdf[4, :pnl]
 
 # ╔═╡ 4aa92651-1e2b-4c78-b330-5471cefd4e43
 md"""
@@ -315,9 +309,6 @@ rdf[5, :]
 # ╔═╡ ee115084-6f76-4b8e-abcd-680c927c6cb3
 rdf2[5, :]
 
-# ╔═╡ 34ce1751-53c5-4ea6-9fe2-d3c55a55d051
-rdf2[5, :pnl] - rdf[5, :pnl]
-
 # ╔═╡ 55ec5c0f-95a5-4729-85a5-003058eab3b4
 md"""
 ### Trade 6 Eliminated: Big loss to no loss
@@ -326,9 +317,6 @@ md"""
 
 # ╔═╡ 4bef174a-558d-4ec0-9de0-9be1e3d42e53
 rdf[6, :]
-
-# ╔═╡ ce85a7fb-d1bc-4734-8c40-55f838a00533
-0 - rdf[6, :pnl]
 
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
@@ -1268,18 +1256,14 @@ version = "17.4.0+2"
 # ╟─05fe72c2-d0a2-4d67-81df-17908c29c3c4
 # ╠═871f3aaa-f334-4e26-9d89-2139fe8d5330
 # ╠═8a39b6d5-2d25-40ab-b228-eaab4f563b96
-# ╠═a73d22d0-90cf-41c1-8d4c-999c438ef393
 # ╟─79bdc784-e3cf-4772-b11a-94bcc42e913d
 # ╠═e0ec2d0f-709f-44ff-bfc9-117421ee91c1
 # ╠═d18a6c22-c47f-47ff-af60-fd068e1aaa19
-# ╠═cdfdb1d0-c057-4246-bfe2-43d1cd72434e
 # ╟─4aa92651-1e2b-4c78-b330-5471cefd4e43
 # ╠═7a7b3125-589e-44c0-aba2-47ac87809a3b
 # ╠═ee115084-6f76-4b8e-abcd-680c927c6cb3
-# ╠═34ce1751-53c5-4ea6-9fe2-d3c55a55d051
 # ╟─55ec5c0f-95a5-4729-85a5-003058eab3b4
 # ╠═4bef174a-558d-4ec0-9de0-9be1e3d42e53
-# ╠═ce85a7fb-d1bc-4734-8c40-55f838a00533
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
 # ╠═f3095108-14d2-492b-bff5-cd87395603a8
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
