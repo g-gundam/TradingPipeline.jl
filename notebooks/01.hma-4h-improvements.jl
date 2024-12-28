@@ -172,8 +172,7 @@ function TP.should_open_long(strategy::HMA2Strategy)
 		return true
 	end
 	
-    is_crossed = crossed_up(rf.hma330, rf.hma440)
-	if (is_crossed)
+	if (crossed_up(rf.hma330, rf.hma440))
 		# trade 4 & 5: late entry criteria
 		if percent_diff(rf.hma440[1], rf.c[1]) > 8.5
 			strategy.is_late_entry = true
@@ -201,9 +200,8 @@ function TP.should_close_long(strategy::HMA2Strategy)
     rf = strategy.rf
     if strategy.is_late_entry
         return percent_diff(strategy.entry_price, rf.c[1]) > 6.0
-    else
-        crossed_down(strategy.rf.hma330, strategy.rf.hma440)
-    end
+	end
+    crossed_down(strategy.rf.hma330, strategy.rf.hma440)
 end
 
 # ╔═╡ 001b7749-0a24-4461-9729-203a0e454c6b
@@ -318,6 +316,14 @@ md"""
 # ╔═╡ 4bef174a-558d-4ec0-9de0-9be1e3d42e53
 rdf[6, :]
 
+# ╔═╡ 208afea4-2dcf-4e1d-826c-81591cea9617
+# This turned 7k in losses
+sum(rdf.pnl[4:6])
+
+# ╔═╡ 1d2c6d88-6dc9-4302-8ffc-90776c719cb0
+# ...into 8k in wins.
+sum(rdf2.pnl[4:5])
+
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
 # Libraries
@@ -349,7 +355,7 @@ html"""
         # 383px to accomodate TableOfContents(aside=true)
     }
     .plutoui-toc.aside {
-      width: min(80vw, 400px)
+      width: min(80vw, 320px)
     }
   }
 </style>
@@ -1242,8 +1248,8 @@ version = "17.4.0+2"
 # ╠═c149ff61-3df1-4ab1-b03f-563f456c88fc
 # ╟─eeb6ec32-5ad3-4235-bbd8-0c6f47de0c08
 # ╟─e1b9d946-f59a-4db4-b20f-9f4d0626f45c
-# ╟─e85c116e-acfb-468c-b087-499111d33be1
-# ╟─fc6fd612-ab52-4298-b8f6-b4f1abb2525b
+# ╠═e85c116e-acfb-468c-b087-499111d33be1
+# ╠═fc6fd612-ab52-4298-b8f6-b4f1abb2525b
 # ╠═45e75970-4627-4258-a1cd-a3cd028206b6
 # ╠═0856646f-565f-45bd-a17e-9eac33c82c73
 # ╠═001b7749-0a24-4461-9729-203a0e454c6b
@@ -1264,6 +1270,8 @@ version = "17.4.0+2"
 # ╠═ee115084-6f76-4b8e-abcd-680c927c6cb3
 # ╟─55ec5c0f-95a5-4729-85a5-003058eab3b4
 # ╠═4bef174a-558d-4ec0-9de0-9be1e3d42e53
+# ╠═208afea4-2dcf-4e1d-826c-81591cea9617
+# ╠═1d2c6d88-6dc9-4302-8ffc-90776c719cb0
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
 # ╠═f3095108-14d2-492b-bff5-cd87395603a8
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
