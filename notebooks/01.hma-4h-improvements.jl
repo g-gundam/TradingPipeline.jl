@@ -43,6 +43,34 @@ md"""
 # ╔═╡ b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
 datadir = "../data"
 
+# ╔═╡ ef255b70-795f-4052-9220-3e85f4b7061d
+md"""
+Those who really want to run this notebook themselves will need to download some data using [CryptoMarketData.jl](https://github.com/g-gundam/CryptoMarketData.jl) and put it in "$(datadir)" relative to the location of this notebook.  If you live outside of the US, you can probably skip the [proxy](https://g-gundam.github.io/CryptoMarketData.jl/dev/examples/#Proxies) part.
+
+```julia-repl
+julia> using CryptoMarketData
+
+julia> http_options = Dict(:proxy => "http://user:password@proxyserver:3128")
+Dict{Symbol, String} with 1 entry:
+  :proxy => "http://user:password@proxyserver:3128"
+
+julia> pancakeswap = PancakeSwap(http_options)
+PancakeSwap("https://perp.pancakeswap.finance", Dict(:proxy => "http://user:password@proxyserver:3128"))
+
+julia> save!(pancakeswap, "BTCUSD")
+┌ Info: 2024-12-24
+└   length(cs) = 1440
+┌ Info: 2024-12-25
+└   length(cs) = 1440
+┌ Info: 2024-12-26
+└   length(cs) = 1440
+┌ Info: 2024-12-27
+└   length(cs) = 1440
+┌ Info: 2024-12-28
+└   length(cs) = 1097
+```
+"""
+
 # ╔═╡ 5ef635f6-52b7-4660-beea-bfcd67d67131
 pancakeswap = PancakeSwap()
 
@@ -104,8 +132,21 @@ md"""
 - They were also profitable for a while until they weren't.
 """
 
+# ╔═╡ 69ef481d-a8c8-442b-a30a-501fb41c8516
+md"""
+>Investigating the distance from HMA440 to close price as criteria for late entry
+"""
+
 # ╔═╡ 5a5bc95b-5a79-4e41-8697-a263b2d88ddf
 t4 = around(rdf[4, :entry_ts], r.chart_subject[:trend].df)
+
+# ╔═╡ a618687b-a909-4057-8604-1cad820a867b
+t5 = TP.around(rdf[5, :entry_ts], r.chart_subject[:trend].df)
+
+# ╔═╡ 95a8b4d1-428c-43b5-afef-d2084b19fb82
+md"""
+>Trying to get an idea of potential gain
+"""
 
 # ╔═╡ 85fbdd77-deed-4470-bbf4-917fd941f595
 t4high = around(DateTime("2024-05-21"), r.chart_subject[:trend].df)
@@ -114,14 +155,6 @@ t4high = around(DateTime("2024-05-21"), r.chart_subject[:trend].df)
 # This is the percentage increase of price from entry to a nearby peak.
 # Late entry needs an early exit.
 ((t4high.h[2] - rdf[4, :entry_price]) / rdf[4, :entry_price]) * 100
-
-# ╔═╡ a618687b-a909-4057-8604-1cad820a867b
-t5 = TP.around(rdf[5, :entry_ts], r.chart_subject[:trend].df)
-
-# ╔═╡ 8ffaf850-2f06-4315-8793-84dd0d893f09
-md"""
-- Zooming in, I can see now that hma55 was not where I thought it was for trade 5.
-"""
 
 # ╔═╡ eeb6ec32-5ad3-4235-bbd8-0c6f47de0c08
 md"""
@@ -323,6 +356,93 @@ sum(rdf.pnl[4:6])
 # ╔═╡ 1d2c6d88-6dc9-4302-8ffc-90776c719cb0
 # ...into 8k in wins.
 sum(rdf2.pnl[4:5])
+
+# ╔═╡ 396f5bec-0ec8-473f-b9bf-abe65a2b7d73
+md"""
+## HMABullFighterStrategy
+- Who is brave (or stupid) enough to stand in front of a raging bull and open short positions?
+- My exchange simulator is supposed to know how to short, but I haven't really tried it yet.
+- This is going to be a short-only strategy that's meant to be run during bullish conditions.
+- It's going to be very selective in its entries, and it's designed to take profit quickly and get back to safety.
+
+*to be continued*
+"""
+
+# ╔═╡ c9217c78-a249-4f03-8a5e-fca4272a0559
+@kwdef mutable struct HMABullFighterStrategy <: TP.AbstractStrategy
+	rf::ReversedFrame
+	entry_price::Float64 = 0.0
+end
+
+# ╔═╡ 9031f92e-4ca7-4302-adbe-d8bde9c96125
+function TP.should_open_short(strategy::HMABullFighterStrategy)
+	rf = strategy.rf
+	if ismissing(rf.hma440[1])
+		return false
+	end
+	#if rf.ts[1] < DateTime("2024-04-01")
+	#	return false
+	#end
+	if (crossed_down_currently(rf.hma330, rf.hma440)
+		&& rf.c[1] > rf.hma330[1]
+		&& rf.c[1] < rf.hma440[1]
+		&& negative_slope_currently(rf.hma330)
+		&& negative_slope_currently(rf.hma440))
+	
+		strategy.entry_price = rf.c[1]
+		return true
+	end
+	return false
+end
+
+# ╔═╡ 1b089aa4-8915-4f89-9de9-d50774a0f122
+function TP.should_close_short(strategy::HMABullFighterStrategy)
+	rf = strategy.rf
+	if percent_diff(strategy.entry_price, rf.c[1]) <= -9.0
+		return true
+	end
+	return crossed_up(rf.hma330, rf.hma440) # if this happens, absolutely get out
+end
+
+# ╔═╡ cce8abd8-24cc-4e32-97ed-d82f13733972
+function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Hour(4))
+    hma_chart = Chart(
+        symbol, tf,
+        indicators = [
+            HMA{Float64}(;period=330),
+            HMA{Float64}(;period=440)
+        ],
+        visuals = [
+            Dict(
+                :label_name => "HMA 330",
+                :line_color => "#26c6da",
+                :line_width => 2
+            ),
+            Dict(
+                :label_name => "HMA 440",
+                :line_color => "#64b5f6",
+                :line_width => 3
+            )
+        ]
+    )
+    all_charts = Dict(:trend => hma_chart)
+    chart_subject = TP.ChartSubject(charts=all_charts)
+    strategy = HMABullFighterStrategy(rf=ReversedFrame(hma_chart.df))
+    strategy_subject = TP.StrategySubject(;strategy)
+    return (chart_subject, strategy_subject)
+end
+
+# ╔═╡ 6e5dc20e-a640-491a-960f-53a8f440d776
+r3 = TP.simulate(candle_observable, HMABullFighterStrategy);
+
+# ╔═╡ 4f53788e-6b8a-457f-86a7-1ef2565503a5
+visualize((r3.chart_subject.charts[:trend], r3.simulator_session); min_height=800)
+
+# ╔═╡ 9b5db1ac-f0d5-42d0-b344-6c72c19422b3
+rdf3 = TP.report(r3.simulator_session)
+
+# ╔═╡ 3942d492-d58a-4e0e-b4a0-7edaea463a22
+sum(rdf3.pnl)
 
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
@@ -1225,6 +1345,7 @@ version = "17.4.0+2"
 # ╔═╡ Cell order:
 # ╟─14ee20f3-2742-41d7-b816-0bb2f143e226
 # ╟─38bd1675-650f-4276-becb-216f3da6b630
+# ╟─ef255b70-795f-4052-9220-3e85f4b7061d
 # ╠═b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
 # ╠═5ef635f6-52b7-4660-beea-bfcd67d67131
 # ╠═ed9771c3-9937-4122-9d43-c41ea94db033
@@ -1239,13 +1360,14 @@ version = "17.4.0+2"
 # ╠═2cb4800f-4924-4760-9d13-e96cecd9968f
 # ╠═8bf26867-59b1-47c6-a7af-ff63f06dd9c5
 # ╟─824d9b52-c6c6-4d7c-8775-a51f56eeda28
+# ╟─69ef481d-a8c8-442b-a30a-501fb41c8516
 # ╠═5a5bc95b-5a79-4e41-8697-a263b2d88ddf
-# ╠═85fbdd77-deed-4470-bbf4-917fd941f595
-# ╠═e1318a87-e181-442d-b4d0-49531be21ee3
 # ╠═a618687b-a909-4057-8604-1cad820a867b
-# ╟─8ffaf850-2f06-4315-8793-84dd0d893f09
 # ╠═c852424f-0cc3-48e5-988b-5190f4d93001
 # ╠═c149ff61-3df1-4ab1-b03f-563f456c88fc
+# ╟─95a8b4d1-428c-43b5-afef-d2084b19fb82
+# ╠═85fbdd77-deed-4470-bbf4-917fd941f595
+# ╠═e1318a87-e181-442d-b4d0-49531be21ee3
 # ╟─eeb6ec32-5ad3-4235-bbd8-0c6f47de0c08
 # ╟─e1b9d946-f59a-4db4-b20f-9f4d0626f45c
 # ╠═e85c116e-acfb-468c-b087-499111d33be1
@@ -1272,6 +1394,15 @@ version = "17.4.0+2"
 # ╠═4bef174a-558d-4ec0-9de0-9be1e3d42e53
 # ╠═208afea4-2dcf-4e1d-826c-81591cea9617
 # ╠═1d2c6d88-6dc9-4302-8ffc-90776c719cb0
+# ╟─396f5bec-0ec8-473f-b9bf-abe65a2b7d73
+# ╠═c9217c78-a249-4f03-8a5e-fca4272a0559
+# ╠═9031f92e-4ca7-4302-adbe-d8bde9c96125
+# ╠═1b089aa4-8915-4f89-9de9-d50774a0f122
+# ╠═cce8abd8-24cc-4e32-97ed-d82f13733972
+# ╠═6e5dc20e-a640-491a-960f-53a8f440d776
+# ╠═4f53788e-6b8a-457f-86a7-1ef2565503a5
+# ╠═9b5db1ac-f0d5-42d0-b344-6c72c19422b3
+# ╠═3942d492-d58a-4e0e-b4a0-7edaea463a22
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
 # ╠═f3095108-14d2-492b-bff5-cd87395603a8
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
