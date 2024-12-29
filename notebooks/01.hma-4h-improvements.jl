@@ -364,8 +364,6 @@ md"""
 - My exchange simulator is supposed to know how to short, but I haven't really tried it yet.
 - This is going to be a short-only strategy that's meant to be run during bullish conditions.
 - It's going to be very selective in its entries, and it's designed to take profit quickly and get back to safety.
-
-*to be continued*
 """
 
 # ╔═╡ c9217c78-a249-4f03-8a5e-fca4272a0559
@@ -405,7 +403,7 @@ function TP.should_close_short(strategy::HMABullFighterStrategy)
 end
 
 # ╔═╡ cce8abd8-24cc-4e32-97ed-d82f13733972
-function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Hour(4), stf=Hour(12))
+function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Hour(4), stf=Day(1))
     hma_chart = Chart(
         symbol, tf,
         indicators = [
@@ -427,8 +425,8 @@ function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Ho
     )
 	srsi_chart = Chart(
 		symbol, stf,
-		indicators = [ StochRSI{Float64}(;k_smoothing_period=5, d_smoothing_period=5)],
-		visuals = [nothing]
+		indicators = [ StochRSI{Float64}(;k_smoothing_period=5, d_smoothing_period=5), RSI{Float64}(;period=14)],
+		visuals = [nothing, nothing]
 	)
     all_charts = Dict(:trend => hma_chart, :srsi => srsi_chart)
     chart_subject = TP.ChartSubject(charts=all_charts)
@@ -446,14 +444,49 @@ visualize((r3.chart_subject.charts[:trend], r3.simulator_session); min_height=80
 # ╔═╡ bcc5e3ab-7f02-461f-af15-e152145b2a98
 visualize((r3.chart_subject.charts[:srsi], r3.simulator_session); min_height=800)
 
-# ╔═╡ 60abfce9-cb2a-4810-b7f6-27469833ad8a
-r3.chart_subject.charts[:srsi].df
-
 # ╔═╡ 9b5db1ac-f0d5-42d0-b344-6c72c19422b3
 rdf3 = TP.report(r3.simulator_session)
 
+# ╔═╡ d29fb963-ce84-4f6f-8b58-7d4737fddb4b
+# wins
+sum(filter(n -> n >= 0, rdf3.pnl))
+
+# ╔═╡ 1bfd9090-1a4e-41ff-8fce-99da31fefc2e
+# losses
+sum(filter(n -> n < 0, rdf3.pnl))
+
 # ╔═╡ 3942d492-d58a-4e0e-b4a0-7edaea463a22
+# total
 sum(rdf3.pnl)
+
+# ╔═╡ 91b2d19b-dd46-4729-9ef5-7f37f48cef56
+md"""
+> Well, at least I know shorts work on the simulator.
+"""
+
+# ╔═╡ bc8ff437-2c89-48d1-a25c-8ea09f3fbde2
+md"""
+### Trade 1: Why did it even happen?
+- Despite being profitable, my code shouldn't have allowed it to happen.
+- HMA 440 didn't exist yet, but it opened a short anyway.
+- It doesn't make sense.
+"""
+
+# ╔═╡ 3bf5e1c9-d086-41c7-b4ce-2bfccb497d16
+md"""
+### Trade 3: Brutal
+"""
+
+# ╔═╡ 3f53796b-df26-4f1c-a4b3-fa1759c1d220
+md"""
+### Trade 6: Ouch
+"""
+
+# ╔═╡ 31bbd270-addf-4ec1-9ece-5daa96ac70d5
+md"""
+### Trade 8: What if we went long instead?
+- These are decent long entries.
+"""
 
 # ╔═╡ 7123d5f5-77ff-4231-97e7-be0064a82cf7
 md"""
@@ -1413,9 +1446,15 @@ version = "17.4.0+2"
 # ╠═6e5dc20e-a640-491a-960f-53a8f440d776
 # ╠═4f53788e-6b8a-457f-86a7-1ef2565503a5
 # ╠═bcc5e3ab-7f02-461f-af15-e152145b2a98
-# ╠═60abfce9-cb2a-4810-b7f6-27469833ad8a
 # ╠═9b5db1ac-f0d5-42d0-b344-6c72c19422b3
+# ╠═d29fb963-ce84-4f6f-8b58-7d4737fddb4b
+# ╠═1bfd9090-1a4e-41ff-8fce-99da31fefc2e
 # ╠═3942d492-d58a-4e0e-b4a0-7edaea463a22
+# ╟─91b2d19b-dd46-4729-9ef5-7f37f48cef56
+# ╟─bc8ff437-2c89-48d1-a25c-8ea09f3fbde2
+# ╟─3bf5e1c9-d086-41c7-b4ce-2bfccb497d16
+# ╟─3f53796b-df26-4f1c-a4b3-fa1759c1d220
+# ╟─31bbd270-addf-4ec1-9ece-5daa96ac70d5
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
 # ╠═f3095108-14d2-492b-bff5-cd87395603a8
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
