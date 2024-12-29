@@ -371,19 +371,19 @@ md"""
 # ╔═╡ c9217c78-a249-4f03-8a5e-fca4272a0559
 @kwdef mutable struct HMABullFighterStrategy <: TP.AbstractStrategy
 	rf::ReversedFrame
+	srf::ReversedFrame
 	entry_price::Float64 = 0.0
 end
 
 # ╔═╡ 9031f92e-4ca7-4302-adbe-d8bde9c96125
 function TP.should_open_short(strategy::HMABullFighterStrategy)
 	rf = strategy.rf
+	srf = strategy.srf
 	if ismissing(rf.hma440[1])
 		return false
 	end
-	#if rf.ts[1] < DateTime("2024-04-01")
-	#	return false
-	#end
 	if (crossed_down_currently(rf.hma330, rf.hma440)
+		#&& crossed_down_currently(srf.stochrsi_k, srf.stochrsi_d)
 		&& rf.c[1] > rf.hma330[1]
 		&& rf.c[1] < rf.hma440[1]
 		&& negative_slope_currently(rf.hma330)
@@ -405,7 +405,7 @@ function TP.should_close_short(strategy::HMABullFighterStrategy)
 end
 
 # ╔═╡ cce8abd8-24cc-4e32-97ed-d82f13733972
-function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Hour(4))
+function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Hour(4), stf=Hour(12))
     hma_chart = Chart(
         symbol, tf,
         indicators = [
@@ -425,9 +425,14 @@ function TP.load_strategy(::Type{HMABullFighterStrategy}; symbol="BTCUSD", tf=Ho
             )
         ]
     )
-    all_charts = Dict(:trend => hma_chart)
+	srsi_chart = Chart(
+		symbol, stf,
+		indicators = [ StochRSI{Float64}(;k_smoothing_period=5, d_smoothing_period=5)],
+		visuals = [nothing]
+	)
+    all_charts = Dict(:trend => hma_chart, :srsi => srsi_chart)
     chart_subject = TP.ChartSubject(charts=all_charts)
-    strategy = HMABullFighterStrategy(rf=ReversedFrame(hma_chart.df))
+    strategy = HMABullFighterStrategy(rf=ReversedFrame(hma_chart.df), srf=ReversedFrame(srsi_chart.df))
     strategy_subject = TP.StrategySubject(;strategy)
     return (chart_subject, strategy_subject)
 end
@@ -437,6 +442,12 @@ r3 = TP.simulate(candle_observable, HMABullFighterStrategy);
 
 # ╔═╡ 4f53788e-6b8a-457f-86a7-1ef2565503a5
 visualize((r3.chart_subject.charts[:trend], r3.simulator_session); min_height=800)
+
+# ╔═╡ bcc5e3ab-7f02-461f-af15-e152145b2a98
+visualize((r3.chart_subject.charts[:srsi], r3.simulator_session); min_height=800)
+
+# ╔═╡ 60abfce9-cb2a-4810-b7f6-27469833ad8a
+r3.chart_subject.charts[:srsi].df
 
 # ╔═╡ 9b5db1ac-f0d5-42d0-b344-6c72c19422b3
 rdf3 = TP.report(r3.simulator_session)
@@ -1401,6 +1412,8 @@ version = "17.4.0+2"
 # ╠═cce8abd8-24cc-4e32-97ed-d82f13733972
 # ╠═6e5dc20e-a640-491a-960f-53a8f440d776
 # ╠═4f53788e-6b8a-457f-86a7-1ef2565503a5
+# ╠═bcc5e3ab-7f02-461f-af15-e152145b2a98
+# ╠═60abfce9-cb2a-4810-b7f6-27469833ad8a
 # ╠═9b5db1ac-f0d5-42d0-b344-6c72c19422b3
 # ╠═3942d492-d58a-4e0e-b4a0-7edaea463a22
 # ╟─7123d5f5-77ff-4231-97e7-be0064a82cf7
