@@ -18,3 +18,7 @@
 ## What's going to be in here?
 
 - ...a lot
+
+## Read More About It
+
+- https://g-gundam.github.io/
