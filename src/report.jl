@@ -14,7 +14,8 @@ function make_result(open::XO.SimulatorMarketBuyFill, close::XO.SimulatorMarketS
             exit_ts     = close.ts,
             exit_price  = close.price,
             amount      = close.amount,
-            pnl         = r.profit_loss)
+            pnl         = r.profit_loss,
+            percent     = r.profit_loss_percent)
 end
 
 function make_result(open::XO.SimulatorMarketSellFill, close::XO.SimulatorMarketBuyFill)
@@ -25,7 +26,8 @@ function make_result(open::XO.SimulatorMarketSellFill, close::XO.SimulatorMarket
             exit_ts     = close.ts,
             exit_price  = close.price,
             amount      = close.amount,
-            pnl         = r.profit_loss)
+            pnl         = r.profit_loss,
+            percent     = r.profit_loss_percent)
 end
 
 """report(session::XO.SimulatorSession) -> DataFrame
