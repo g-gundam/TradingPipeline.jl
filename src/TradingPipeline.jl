@@ -42,6 +42,8 @@ end
 # REPL work
 
 #=
+
+using Statistics
 using CryptoMarketData
 using TechnicalIndicatorCharts
 using ReversedSeries
@@ -62,4 +64,9 @@ using TradingPipeline: load_strategy, report
 candle_observable = df_candles_observable(btcusd1m)
 @unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMA2Strategy);
 rdf = report(simulator_session)
+
+sum(rdf.pnl)
+mean(rdf.pnl)
+mean(rdf.percent)
+
 =#
