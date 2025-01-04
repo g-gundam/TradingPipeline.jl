@@ -28,6 +28,7 @@ export report
 include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
+include("strategies/hma2.jl")
 export load_strategy
 include("hsm_types.jl")
 include("rocket.jl")
@@ -55,10 +56,10 @@ btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"
 import TradingPipeline as TP
 import HierarchicalStateMachines as HSM
 using TradingPipeline
-using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, df_candles_observable, @hsm
+using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable
 using TradingPipeline: load_strategy, report
 
 candle_observable = df_candles_observable(btcusd1m)
-@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMAStrategy);
+@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMA2Strategy);
 rdf = report(simulator_session)
 =#
