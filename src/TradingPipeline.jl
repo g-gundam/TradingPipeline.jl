@@ -20,6 +20,7 @@ using TechnicalIndicatorCharts
 using ReversedSeries
 import ExchangeOperations as XO
 
+include("util.jl")
 include("pnl.jl")
 include("report.jl")
 include("explore.jl")
