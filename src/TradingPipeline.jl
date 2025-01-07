@@ -31,6 +31,7 @@ include("strategies/hma.jl")
 include("strategies/hma2.jl")
 export load_strategy
 include("hsm_types.jl")
+include("candles.jl")
 include("rocket.jl")
 include("pipeline.jl")
 export simulate
