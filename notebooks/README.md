@@ -1,6 +1,19 @@
 # TradingPipeline.jl/notebooks
 
-## 00.jl 
+## 00.jl (TODO)
+
+- This notebook uses:
+  + registered packages 
+  + unregistered TradingPipeline.jl from this package.
+
+## 01.jl
+
+- This notebook uses:
+  + registered packages
+  + unregistered TradingPipeline.jl
+  + assumes CryptoMarketData.jl has already downloaded some sample data.
+
+## 02.jl (TODO)
 
 - I want this notebook to be a template for notebook-based backtesting sessions.
 - It makes assumptions about where my other libraries are checked out.
