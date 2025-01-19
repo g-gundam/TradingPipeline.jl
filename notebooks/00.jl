@@ -44,6 +44,7 @@ begin
 	using Chain
 	using UnPack
 	using LightweightCharts
+	using MarketData
 	using NomnomlJS
 end
 
@@ -197,6 +198,7 @@ DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
 LightweightCharts = "d6998af1-87ca-4e7f-83d4-864c79a249fa"
+MarketData = "945b72a4-3b13-509d-9b46-1525bb5c06de"
 NomnomlJS = "05e5b401-cbd0-4511-9ee7-1ac7fa2205f5"
 PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 ReversedSeries = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
@@ -211,6 +213,7 @@ CryptoMarketData = "~1.0.5"
 DataFrames = "~1.7.0"
 ExchangeOperations = "~0.0.1"
 LightweightCharts = "~2.3.0"
+MarketData = "~0.15.0"
 NomnomlJS = "~0.2.0"
 PlutoUI = "~0.7.60"
 ReversedSeries = "~1.1.0"
@@ -226,7 +229,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "6e48e10f3688446d020c98223b2fd8ef59fe3d6c"
+project_hash = "0b9d92d5e02da534d5866f0021bf6065362bc610"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -367,6 +370,12 @@ version = "1.0.0"
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
 version = "1.11.0"
+
+[[deps.DelimitedFiles]]
+deps = ["Mmap"]
+git-tree-sha1 = "9e2f36d3c96a820c678f2f1f1782582fcf685bae"
+uuid = "8bb1440f-4735-579b-a4ab-409b98df4dab"
+version = "1.9.1"
 
 [[deps.Distributed]]
 deps = ["Random", "Serialization", "Sockets"]
@@ -738,6 +747,12 @@ deps = ["Base64"]
 uuid = "d6f4376e-aef5-505a-96c1-9c027394607a"
 version = "1.11.0"
 
+[[deps.MarketData]]
+deps = ["CSV", "Dates", "HTTP", "JSON3", "Random", "Reexport", "TimeSeries"]
+git-tree-sha1 = "b69260020b27b631337afd8bd8659115ba89b0f0"
+uuid = "945b72a4-3b13-509d-9b46-1525bb5c06de"
+version = "0.15.0"
+
 [[deps.MbedTLS]]
 deps = ["Dates", "MbedTLS_jll", "MozillaCACerts_jll", "NetworkOptions", "Random", "Sockets"]
 git-tree-sha1 = "c067a280ddc25f196b5e7df3877c6b226d390aaf"
@@ -918,6 +933,12 @@ deps = ["SHA"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 version = "1.11.0"
 
+[[deps.RecipesBase]]
+deps = ["PrecompileTools"]
+git-tree-sha1 = "5c3d09cc4f31f5fc6af001c250bf1278733100ff"
+uuid = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
+version = "1.3.4"
+
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
@@ -1093,17 +1114,21 @@ git-tree-sha1 = "e87dd4db778a4cf1adf3f60d5df0084acbde6234"
 uuid = "ef104744-fcb3-4e7e-8bb2-6e95860d81ed"
 version = "0.1.1"
 
+[[deps.TimeSeries]]
+deps = ["Dates", "DelimitedFiles", "DocStringExtensions", "IteratorInterfaceExtensions", "PrettyTables", "RecipesBase", "Reexport", "Statistics", "TableTraits", "Tables"]
+git-tree-sha1 = "b0915b2d6032bab5d8c9424a37bc621500a67df9"
+uuid = "9e3dc215-6440-5c97-bce1-76c03772f85e"
+version = "0.24.2"
+
 [[deps.TimeZones]]
 deps = ["Artifacts", "Dates", "Downloads", "InlineStrings", "Mocking", "Printf", "Scratch", "TZJData", "Unicode", "p7zip_jll"]
 git-tree-sha1 = "fcbcffdc11524d08523e92ae52214b29d90b50bb"
 uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
 version = "1.20.0"
+weakdeps = ["RecipesBase"]
 
     [deps.TimeZones.extensions]
     TimeZonesRecipesBaseExt = "RecipesBase"
-
-    [deps.TimeZones.weakdeps]
-    RecipesBase = "3cdcf5f2-1ef4-517c-9805-6587b60abb01"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
