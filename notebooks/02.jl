@@ -17,6 +17,7 @@ begin
 	using UnPack
 	using LightweightCharts
 	using OnlineTechnicalIndicators
+	using NomnomlJS
 end
 
 # ╔═╡ bfda450f-17ac-4455-8ba2-77f589da713e
@@ -55,11 +56,16 @@ begin
 	import ExchangeOperations as XO
 end
 
-# ╔═╡ 14ee20f3-2742-41d7-b816-0bb2f143e226
+# ╔═╡ 0e4ebea7-5b6a-4e78-bd9b-011bf5d094a6
 md"""
 # 02 - Template for using latest unregistered libraries
-- This notebook file can be copied and used as a template for strategy development sessions.
-- It's setup to use local versions of my libraries that may not have been registered yet.
+
+- 00.jl is meant to be a template for strategy backtesting in Pluto notebooks.
+- It assumes a certain directory structure in order to load the latest versions of my libraries and be able to use Revise.jl in a notebook context.
+- Check out my Julia repos so that they're all next to each other like in the diagram.
+- Download the data pack from CryptoMarketData.jl and symlink it to data under TradingPipeline.jl
+  + ...or just use CryptoMarketData.jl to download candles yourself.
+- Right click on the image below and open image in new tab if the text is too small to read.
 """
 
 # ╔═╡ 38bd1675-650f-4276-becb-216f3da6b630
@@ -255,8 +261,50 @@ html"""
 </style>
 """
 
+# ╔═╡ 4c7c4fd0-94a4-4778-9859-30badc37dfa9
+md"""
+# Diagrams
+"""
+
+# ╔═╡ 2722986a-71a7-4d20-aa84-813b33af0ce7
+noml_fs = begin
+	src = """
+[<frame> File System Layout |
+[g-gundam] -> [CryptoMarketData.jl | Provide candle data.]
+[g-gundam] -> [TechnicalIndicatorCharts.jl | Incrementally build charts 
+(with indicators)
+from candle data]
+[g-gundam] -> [ReversedSeries.jl | Looking at series in reverse
+makes it easier for me to
+write analysis functions.]
+[g-gundam] -> [ExchangeOperations.jl | My exchange simulator lives here.]
+[g-gundam] -> [TradingPipeline.jl | Use Rocket.jl to connect all the
+async pieces together.]
+[TradingPipeline.jl] -> [notebooks]
+[TradingPipeline.jl] -> [data]
+[notebooks] -> [00.jl]
+[notebooks] -> [01.jl]
+[notebooks] -> [<box> 02.jl | You are here! ]
+
+#.box: fill=#8f8
+[<box> 02.jl]
+
+[data |
+This can be a symlink
+to where you normally
+store the candles downloaded
+via CryptoMarketData.jl]
+]
+	"""
+	Diagram(src)
+end;
+
+# ╔═╡ 23cbe3f4-96de-4210-ba14-2c4fdd887ece
+noml_fs
+
 # ╔═╡ Cell order:
-# ╟─14ee20f3-2742-41d7-b816-0bb2f143e226
+# ╟─0e4ebea7-5b6a-4e78-bd9b-011bf5d094a6
+# ╠═23cbe3f4-96de-4210-ba14-2c4fdd887ece
 # ╟─38bd1675-650f-4276-becb-216f3da6b630
 # ╠═b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
 # ╠═5ef635f6-52b7-4660-beea-bfcd67d67131
@@ -286,3 +334,5 @@ html"""
 # ╠═318f5d44-f400-461d-bb13-34014d553268
 # ╟─db3b46c0-4f25-4a8e-ada2-00fad0e796d8
 # ╠═ab4805a4-1482-4531-90d2-b8ef0741c026
+# ╠═4c7c4fd0-94a4-4778-9859-30badc37dfa9
+# ╠═2722986a-71a7-4d20-aa84-813b33af0ce7
