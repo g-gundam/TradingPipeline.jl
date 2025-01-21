@@ -10,30 +10,6 @@ begin
 	import TradingPipeline as TP
 end
 
-# ╔═╡ 89116502-bb8a-42e5-a75d-6b7559e54967
-begin
-	push!(LOAD_PATH, "../../CryptoMarketData.jl/Project.toml")
-	using CryptoMarketData
-end
-
-# ╔═╡ 00babb13-07d0-43a3-a8c2-6e5d7af975af
-begin
-	push!(LOAD_PATH, "../../TechnicalIndicatorCharts.jl/Project.toml")
-	using TechnicalIndicatorCharts
-end
-
-# ╔═╡ 214ba5cd-4215-4cda-8a7e-9659faa42818
-begin
-	push!(LOAD_PATH, "../../ReversedSeries.jl/Project.toml")
-	using ReversedSeries
-end
-
-# ╔═╡ 318f5d44-f400-461d-bb13-34014d553268
-begin
-	push!(LOAD_PATH, "../../ExchangeOperations.jl/Project.toml")
-	import ExchangeOperations as XO
-end
-
 # ╔═╡ f3095108-14d2-492b-bff5-cd87395603a8
 begin
 	using Revise
@@ -45,18 +21,18 @@ begin
 	using UnPack
 	using LightweightCharts
 	using MarketData
+	using TechnicalIndicatorCharts
+	using ReversedSeries
+	using ExchangeOperations
 	using NomnomlJS
 end
 
 # ╔═╡ 14ee20f3-2742-41d7-b816-0bb2f143e226
 md"""
 # Introduction
-- 00.jl is meant to be a template for strategy backtesting in Pluto notebooks.
-- It assumes a certain directory structure in order to load the latest versions of my libraries and be able to use Revise.jl in a notebook context.
-- Check out my Julia repos so that they're all next to each other like in the diagram.
-- Download the data pack from CryptoMarketData.jl and symlink it to data under TradingPipeline.jl
-  + ...or just use CryptoMarketData.jl to download candles yourself.
-- Right click on the image below and open image in new tab if the text is too small to read.
+- 00.jl is meant to be an easily runnable notebook that uses mostly registered modules.
+  + The only unregistered module is TradingPipeline.jl.
+- It uses MarketData.jl as its data source for backtesting.
 """
 
 # ╔═╡ 38bd1675-650f-4276-becb-216f3da6b630
@@ -64,17 +40,22 @@ md"""
 # Data
 """
 
-# ╔═╡ b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
-datadir = "../data"
+# ╔═╡ 048a9252-b248-4f20-88b0-9525283873d3
+function make_timearrays_candles(ta::TimeArray) # TODO: define type for interval more precisely
+    Rocket.make(Candle) do actor
+        for row in ta
+            (date, vv) = row
+            ts = DateTime(date)
+            (o, h, l, c, v) = vv
+            candle = Candle(;ts, o, h, l, c, v)
+            next!(actor, candle)
+        end
+        complete!(actor)
+    end
+end
 
-# ╔═╡ 5ef635f6-52b7-4660-beea-bfcd67d67131
-pancakeswap = PancakeSwap()
-
-# ╔═╡ ed9771c3-9937-4122-9d43-c41ea94db033
-btcusd1m = load(pancakeswap, "BTCUSD"; datadir, span=Date("2023-07-01"):Date("2024-11-29"));
-
-# ╔═╡ db7ee608-5c9c-40db-9ba8-40159219b95b
-candle_observable = TP.df_candles_observable(btcusd1m)
+# ╔═╡ d33d0ffb-182f-4c15-97e3-2f6f5d44ee94
+candle_observable = make_timearrays_candles(MarketData.AAPL)
 
 # ╔═╡ cd94145a-4946-443f-aefe-f578f3be7f24
 md"""
@@ -165,9 +146,6 @@ via CryptoMarketData.jl]
 	Diagram(src)
 end;
 
-# ╔═╡ fbdcdced-3b73-41a5-ae78-08c5b2f5f47f
-noml_fs
-
 # ╔═╡ db3b46c0-4f25-4a8e-ada2-00fad0e796d8
 md"""
 # CSS
@@ -193,7 +171,6 @@ html"""
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
 Chain = "8be319e6-bccf-4806-a6f7-6fae938471bc"
-CryptoMarketData = "57973c84-8724-49d2-9af5-7f2266b21095"
 DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 ExchangeOperations = "48bbcad9-ae6a-4618-9eec-9c3ca8e1b15b"
@@ -209,17 +186,16 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 
 [compat]
 Chain = "~0.6.0"
-CryptoMarketData = "~1.0.5"
 DataFrames = "~1.7.0"
 ExchangeOperations = "~0.0.1"
 LightweightCharts = "~2.3.0"
 MarketData = "~0.15.0"
 NomnomlJS = "~0.2.0"
 PlutoUI = "~0.7.60"
-ReversedSeries = "~1.1.0"
+ReversedSeries = "~1.1.2"
 Revise = "~3.6.4"
 Rocket = "~1.8.1"
-TechnicalIndicatorCharts = "~0.6.0"
+TechnicalIndicatorCharts = "~0.6.3"
 UnPack = "~1.0.2"
 """
 
@@ -229,7 +205,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.2"
 manifest_format = "2.0"
-project_hash = "0b9d92d5e02da534d5866f0021bf6065362bc610"
+project_hash = "d43614b5fc2f8407f31c2a60f6bfdca5bb93df59"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -332,12 +308,6 @@ git-tree-sha1 = "249fe38abf76d48563e2f4556bebd215aa317e15"
 uuid = "a8cc5b0e-0ffa-5ad4-8c14-923d3ee1735f"
 version = "4.1.1"
 
-[[deps.CryptoMarketData]]
-deps = ["CSV", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "HTTP", "JSON3", "NanoDates", "Nullables", "Printf", "TidyTest", "TimeZones", "URIs"]
-git-tree-sha1 = "2e87dba03062ce16bd9db62f180fe0a60f77e732"
-uuid = "57973c84-8724-49d2-9af5-7f2266b21095"
-version = "1.0.5"
-
 [[deps.DataAPI]]
 git-tree-sha1 = "abe83f3a2f1b857aac70ef8b269080af17764bbe"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
@@ -415,11 +385,6 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "e51db81749b0777b2147fbe7b783ee79045b8e99"
 uuid = "2e619515-83b5-522b-bb60-26c02a35a201"
 version = "2.6.4+1"
-
-[[deps.ExprTools]]
-git-tree-sha1 = "27415f162e6028e81c72b82ef756bf321213b6ec"
-uuid = "e2ba6199-217a-4e67-a87a-7c52f15ade04"
-version = "0.1.10"
 
 [[deps.EzXML]]
 deps = ["Printf", "XML2_jll"]
@@ -774,12 +739,6 @@ version = "1.2.0"
 uuid = "a63ad114-7e13-5084-954f-fe012c677804"
 version = "1.11.0"
 
-[[deps.Mocking]]
-deps = ["Compat", "ExprTools"]
-git-tree-sha1 = "2c140d60d7cb82badf06d8783800d0bcd1a7daa2"
-uuid = "78c3b35d-d492-501b-9361-3d52fe80e533"
-version = "0.8.1"
-
 [[deps.MozillaCACerts_jll]]
 uuid = "14a3606d-f60d-562e-9121-12d972cd8159"
 version = "2023.12.12"
@@ -805,11 +764,6 @@ deps = ["Artifacts", "Librsvg_jll", "NodeJS"]
 git-tree-sha1 = "1b65289e27abd3fec2d2a0dab299d70f4c933e55"
 uuid = "05e5b401-cbd0-4511-9ee7-1ac7fa2205f5"
 version = "0.2.0"
-
-[[deps.Nullables]]
-git-tree-sha1 = "8f87854cc8f3685a60689d8edecaa29d2251979b"
-uuid = "4d1e1d77-625e-5b40-9113-a560ec7a8ecd"
-version = "1.0.0"
 
 [[deps.OnlineStatsBase]]
 deps = ["AbstractTrees", "Dates", "LinearAlgebra", "OrderedCollections", "Statistics", "StatsBase"]
@@ -952,9 +906,9 @@ version = "1.3.0"
 
 [[deps.ReversedSeries]]
 deps = ["Chain", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "TidyTest"]
-git-tree-sha1 = "252a9174bf5daec5d99b31d3c941b95e2d658a3d"
+git-tree-sha1 = "859e0d3e5e753873ff5f86157bb63cbab31872ef"
 uuid = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
-version = "1.1.0"
+version = "1.1.2"
 
 [[deps.Revise]]
 deps = ["CodeTracking", "Distributed", "FileWatching", "JuliaInterpreter", "LibGit2", "LoweredCodeUtils", "OrderedCollections", "REPL", "Requires", "UUIDs", "Unicode"]
@@ -971,12 +925,6 @@ version = "1.8.1"
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
 version = "0.7.0"
-
-[[deps.Scratch]]
-deps = ["Dates"]
-git-tree-sha1 = "3bac05bc7e74a75fd9cba4295cde4045d9fe2386"
-uuid = "6c6a2e73-6563-6170-7368-637461726353"
-version = "1.2.1"
 
 [[deps.SentinelArrays]]
 deps = ["Dates", "Random"]
@@ -1068,12 +1016,6 @@ deps = ["Dates"]
 uuid = "fa267f1f-6049-4f14-aa54-33bafae1ed76"
 version = "1.0.3"
 
-[[deps.TZJData]]
-deps = ["Artifacts"]
-git-tree-sha1 = "006a327222dda856e2304959e566ff0104ac8594"
-uuid = "dc5dba14-91b3-4cab-a142-028a31da12f7"
-version = "1.3.1+2024b"
-
 [[deps.TableMetadataTools]]
 deps = ["DataAPI", "Dates", "TOML", "Tables", "Unitful"]
 git-tree-sha1 = "c0405d3f8189bb9a9755e429c6ea2138fca7e31f"
@@ -1098,10 +1040,10 @@ uuid = "a4e569a6-e804-4fa4-b0f3-eef7a1d5b13e"
 version = "1.10.0"
 
 [[deps.TechnicalIndicatorCharts]]
-deps = ["Chain", "DataFrames", "DataFramesMeta", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "f349180d0ef733fdbca850c801fd2cd40e61e041"
+deps = ["Chain", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
+git-tree-sha1 = "6645cca27daa7b64a410468aa76df9e8706e6142"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.0"
+version = "0.6.3"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
@@ -1119,16 +1061,6 @@ deps = ["Dates", "DelimitedFiles", "DocStringExtensions", "IteratorInterfaceExte
 git-tree-sha1 = "b0915b2d6032bab5d8c9424a37bc621500a67df9"
 uuid = "9e3dc215-6440-5c97-bce1-76c03772f85e"
 version = "0.24.2"
-
-[[deps.TimeZones]]
-deps = ["Artifacts", "Dates", "Downloads", "InlineStrings", "Mocking", "Printf", "Scratch", "TZJData", "Unicode", "p7zip_jll"]
-git-tree-sha1 = "fcbcffdc11524d08523e92ae52214b29d90b50bb"
-uuid = "f269a46b-ccf7-5d73-abea-4c690281aa53"
-version = "1.20.0"
-weakdeps = ["RecipesBase"]
-
-    [deps.TimeZones.extensions]
-    TimeZonesRecipesBaseExt = "RecipesBase"
 
 [[deps.TranscodingStreams]]
 git-tree-sha1 = "0c45878dcfdcfa8480052b6ab162cdd138781742"
@@ -1308,13 +1240,10 @@ version = "17.4.0+2"
 """
 
 # ╔═╡ Cell order:
-# ╠═14ee20f3-2742-41d7-b816-0bb2f143e226
-# ╠═fbdcdced-3b73-41a5-ae78-08c5b2f5f47f
+# ╟─14ee20f3-2742-41d7-b816-0bb2f143e226
 # ╟─38bd1675-650f-4276-becb-216f3da6b630
-# ╠═b2b6745d-4dd4-4a82-af6f-c1d0d791fc00
-# ╠═5ef635f6-52b7-4660-beea-bfcd67d67131
-# ╠═ed9771c3-9937-4122-9d43-c41ea94db033
-# ╠═db7ee608-5c9c-40db-9ba8-40159219b95b
+# ╟─048a9252-b248-4f20-88b0-9525283873d3
+# ╠═d33d0ffb-182f-4c15-97e3-2f6f5d44ee94
 # ╟─cd94145a-4946-443f-aefe-f578f3be7f24
 # ╠═84d40e0c-ccd2-4e19-9770-30c01a9d26fc
 # ╟─ef19c935-3270-46e3-97a0-8e874bb56643
@@ -1330,10 +1259,6 @@ version = "17.4.0+2"
 # ╠═dbfea1b0-d616-416a-a7d3-e1d59121071d
 # ╟─533cd39c-bde7-11ef-127b-c917240c6f66
 # ╠═bfda450f-17ac-4455-8ba2-77f589da713e
-# ╠═89116502-bb8a-42e5-a75d-6b7559e54967
-# ╠═00babb13-07d0-43a3-a8c2-6e5d7af975af
-# ╠═214ba5cd-4215-4cda-8a7e-9659faa42818
-# ╠═318f5d44-f400-461d-bb13-34014d553268
 # ╟─f9600b7e-0772-4536-9959-1fc4e03cb6e6
 # ╠═73a83946-b67f-4b77-a58c-4c7bc30cffd3
 # ╟─db3b46c0-4f25-4a8e-ada2-00fad0e796d8
