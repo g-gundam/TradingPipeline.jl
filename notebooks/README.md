@@ -13,7 +13,7 @@
   + unregistered TradingPipeline.jl
   + assumes CryptoMarketData.jl has already downloaded some sample data.
 
-## 02.jl (TODO)
+## 02.jl
 
 - I want this notebook to be a template for notebook-based backtesting sessions.
 - It makes assumptions about where my other libraries are checked out.
