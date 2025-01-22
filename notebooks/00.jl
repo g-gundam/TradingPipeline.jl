@@ -70,12 +70,12 @@ end
 "human-readable asset name"
 asset_name = Dict(
 	AAPL => "Apple 1986-2012", 
-	BA => "Boeing 1962-2012",
-	CAT => "Caterpillar 1962-2012",
+	BA   => "Boeing 1962-2012",
+	CAT  => "Caterpillar 1962-2012",
 	DELL => "Dell 1988-2015",
 	EBAY => "eBay 1998-2016",
-	F => "Ford 1998-2016",
-	GE => "General Electric 1962-2016",
+	F    => "Ford 1998-2016",
+	GE   => "General Electric 1962-2016",
 )
 
 # ╔═╡ cd94145a-4946-443f-aefe-f578f3be7f24
@@ -169,12 +169,12 @@ slow_ma = slow_ma_type{Float64}(period=slow_ma_period)
 # ╔═╡ 4ced98dd-5862-4b38-a40c-4f91166e159c
 @bind asset Select([
 	AAPL => "Apple 1986-2012", 
-	BA => "Boeing 1962-2012",
-	CAT => "Caterpillar 1962-2012",
+	BA   => "Boeing 1962-2012",
+	CAT  => "Caterpillar 1962-2012",
 	DELL => "Dell 1988-2015",
 	EBAY => "eBay 1998-2016",
-	F => "Ford 1998-2016",
-	GE => "General Electric 1962-2016",
+	F    => "Ford 1998-2016",
+	GE   => "General Electric 1962-2016",
 ])
 
 # ╔═╡ d33d0ffb-182f-4c15-97e3-2f6f5d44ee94
