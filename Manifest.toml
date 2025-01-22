@@ -1,6 +1,6 @@
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.2"
+julia_version = "1.11.3"
 manifest_format = "2.0"
 project_hash = "14a2969d7d8b944836b02b557e1c00f57ad2191f"
 
@@ -473,9 +473,9 @@ version = "1.2.2"
 
 [[deps.ReversedSeries]]
 deps = ["Chain", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "TidyTest"]
-git-tree-sha1 = "6fd19670d521479db2b3f76b4a066b72c4582146"
+git-tree-sha1 = "859e0d3e5e753873ff5f86157bb63cbab31872ef"
 uuid = "87ffe17a-2ae0-4c33-b274-0f3657b00e05"
-version = "1.1.1"
+version = "1.1.2"
 
 [[deps.Rocket]]
 deps = ["DataStructures", "Sockets", "Unrolled"]
@@ -605,9 +605,9 @@ version = "1.12.0"
 
 [[deps.TechnicalIndicatorCharts]]
 deps = ["Chain", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "10378437c3eb164256f573773441e81e23ddd138"
+git-tree-sha1 = "6645cca27daa7b64a410468aa76df9e8706e6142"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.1"
+version = "0.6.3"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
