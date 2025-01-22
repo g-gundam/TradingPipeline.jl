@@ -65,7 +65,7 @@ md"""
 """
 
 # ╔═╡ 84d40e0c-ccd2-4e19-9770-30c01a9d26fc
-TP.HMAStrategy
+TP.HMA2Strategy
 
 # ╔═╡ ef19c935-3270-46e3-97a0-8e874bb56643
 md"""
@@ -75,7 +75,7 @@ md"""
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
 # If it says "wtf", just run it again.
 # It mysteriously fails on the first try, but works afterward.
-r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Hour(4));
+r = TP.simulate(candle_observable, TP.HMAStrategy; tf=Day(1));
 
 # ╔═╡ 98b2d2f6-d522-43f0-bbea-768176f210ef
 md"""
