@@ -146,7 +146,7 @@ md"""
 """
 
 # ╔═╡ 2ec969cb-a1f4-4020-99ba-5454b857473c
-MAs = [SMA, EMA, HMA]
+MAs = [SMA, EMA, HMA, ALMA, DEMA, SMMA, WMA]
 
 # ╔═╡ 9d95a160-5992-424c-ab01-3e0babaf5089
 @bind fast_ma_type Select(MAs)
@@ -180,6 +180,9 @@ slow_ma = slow_ma_type{Float64}(period=slow_ma_period)
 # ╔═╡ d33d0ffb-182f-4c15-97e3-2f6f5d44ee94
 candle_observable = make_timearrays_candles(asset)
 
+# ╔═╡ 55b6ac9d-2fa9-4d0f-b288-1271a5a680cc
+@bind tf Select([Day(1), Day(2), Day(3), Week(1), Month(1)])
+
 # ╔═╡ 7d37b00a-93b8-491b-8149-ab2dca92d622
 @bind fast_color html"""<input type="color" value="#3584e4" />"""
 
@@ -189,7 +192,7 @@ candle_observable = make_timearrays_candles(asset)
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
 # If it says "wtf", just run it again.
 # It mysteriously fails on the first try, but works afterward.
-r = TP.simulate(candle_observable, GenericCrossStrategy; symbol="Asset: " * asset_name[asset], tf=Day(1), fast_ma, fast_color, slow_ma, slow_color);
+r = TP.simulate(candle_observable, GenericCrossStrategy; symbol="Asset: " * asset_name[asset], tf, fast_ma, fast_color, slow_ma, slow_color);
 
 # ╔═╡ 98b2d2f6-d522-43f0-bbea-768176f210ef
 md"""
@@ -281,7 +284,7 @@ UnPack = "~1.0.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.2"
+julia_version = "1.11.3"
 manifest_format = "2.0"
 project_hash = "d122ca71a9617838834d9acdcd205a42e451a421"
 
@@ -1106,6 +1109,7 @@ version = "17.4.0+2"
 # ╠═91b48d1d-5464-40c4-a8de-c2ad4970bdd3
 # ╠═5741960e-aed7-45e2-8483-3f7045f8c4c6
 # ╠═4ced98dd-5862-4b38-a40c-4f91166e159c
+# ╠═55b6ac9d-2fa9-4d0f-b288-1271a5a680cc
 # ╠═7d37b00a-93b8-491b-8149-ab2dca92d622
 # ╠═ca92b4c6-c23f-45b5-a615-cac812cca792
 # ╟─98b2d2f6-d522-43f0-bbea-768176f210ef
