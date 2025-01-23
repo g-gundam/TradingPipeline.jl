@@ -70,7 +70,7 @@ function simulate_main(candle_observable, chart_subject, ss)
 
     # Connect strategy_subject => simulator_exchange_driver_subject
     simulator_session = XO.SimulatorSession()
-    simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(simulator_session, [])
+    simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(session=simulator_session)
     #strategy_subject.session = simulator_session # totally optional
     subscribe!(strategy_subject, simulator_exchange_driver_subject)
 

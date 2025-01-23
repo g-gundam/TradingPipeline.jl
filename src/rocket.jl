@@ -284,9 +284,9 @@ end
 # because there are going to be many different exchange drivers.  Some exchanges
 # may have more than one driver depending on how one wants to open/close positions.
 
-struct SimulatorExchangeDriverSubject <: AbstractSubject{Any}
+@kwdef struct SimulatorExchangeDriverSubject <: AbstractSubject{Any}
     session::XO.AbstractSession
-    subscribers::Vector
+    subscribers::Vector = []
 end
 
 function Rocket.on_subscribe!(subject::SimulatorExchangeDriverSubject, actor)
