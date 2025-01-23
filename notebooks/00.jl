@@ -123,7 +123,7 @@ function TP.load_strategy(::Type{GenericCrossStrategy};
 			),
 			Dict(
 				:line_color => slow_color,
-				:line_width => 3
+				:line_width => 4
 			)
 		]
 	)
@@ -184,10 +184,10 @@ candle_observable = make_timearrays_candles(asset)
 @bind tf Select([Day(1), Day(2), Day(3), Week(1), Month(1)])
 
 # ╔═╡ 7d37b00a-93b8-491b-8149-ab2dca92d622
-@bind fast_color html"""<input type="color" value="#3584e4" />"""
+@bind fast_color html"""<input type="color" value="#3584e4" /> Fast MA Color"""
 
 # ╔═╡ ca92b4c6-c23f-45b5-a615-cac812cca792
-@bind slow_color html"""<input type="color" value="#d36582" />"""
+@bind slow_color html"""<input type="color" value="#d36582" /> Slow MA Color"""
 
 # ╔═╡ d5273d6f-6585-4e70-9b0b-533e4b0c2ed5
 # If it says "wtf", just run it again.
@@ -1110,8 +1110,8 @@ version = "17.4.0+2"
 # ╠═5741960e-aed7-45e2-8483-3f7045f8c4c6
 # ╠═4ced98dd-5862-4b38-a40c-4f91166e159c
 # ╠═55b6ac9d-2fa9-4d0f-b288-1271a5a680cc
-# ╠═7d37b00a-93b8-491b-8149-ab2dca92d622
-# ╠═ca92b4c6-c23f-45b5-a615-cac812cca792
+# ╟─7d37b00a-93b8-491b-8149-ab2dca92d622
+# ╟─ca92b4c6-c23f-45b5-a615-cac812cca792
 # ╟─98b2d2f6-d522-43f0-bbea-768176f210ef
 # ╠═52d6a457-041f-47e8-b9d4-660bb202155d
 # ╠═5852651b-e16e-4f74-895c-9d85c5d122bf
