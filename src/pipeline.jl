@@ -58,7 +58,9 @@ function simulate_main(candle_observable, chart_subject, ss)
     candle_subject = Subject(Candle)
     global strategy_subject = ss # XXX: FUUUUUUUU
     src = dirname(@__FILE__)
-    hsm = include("$(src)/hsm_instance.jl") # INFO: It worked.  If HSM gets a v2, I hope I can remove this.
+    # INFO: It worked, but I hate having to do this.
+    # INFO: If HSM gets a v2, I hope I can remove this.
+    hsm = include("$(src)/hsm_instance.jl") # XXX: I wish I didn't have to do this.
     strategy_subject.hsm = hsm
     HSM.transition_to_state!(hsm, hsm)
     sanity_check = typeof(HSM.active_state(hsm))
@@ -71,7 +73,6 @@ function simulate_main(candle_observable, chart_subject, ss)
     # Connect strategy_subject => simulator_exchange_driver_subject
     simulator_session = XO.SimulatorSession()
     simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(session=simulator_session)
-    #strategy_subject.session = simulator_session # totally optional
     subscribe!(strategy_subject, simulator_exchange_driver_subject)
 
     # connect the simulator to candle_subject
