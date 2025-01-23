@@ -284,7 +284,9 @@ end
 # because there are going to be many different exchange drivers.  Some exchanges
 # may have more than one driver depending on how one wants to open/close positions.
 
-@kwdef struct SimulatorExchangeDriverSubject <: AbstractSubject{Any}
+abstract type AbstractExchangeDriverSubject{T} <: AbstractSubject{T} end
+
+@kwdef struct SimulatorExchangeDriverSubject <: AbstractExchangeDriverSubject{Any}
     session::XO.AbstractSession
     subscribers::Vector = []
 end
