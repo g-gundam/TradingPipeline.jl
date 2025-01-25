@@ -255,6 +255,18 @@ end
 
 
 
+@kwdef mutable struct StopSubject <: Rocket.AbstractSubject{Any}
+    policy::AbstractStop
+    subscribers::Vector = []
+end
+
+function Rocket.on_subscribe!(subject::StopSubject, actor)
+    push!(subject.subscribers, actor)
+    return voidTeardown
+end
+
+
+
 # This is for keeping the price updated in the simulator_session.
 # It also got a side job of shutting down a scheduled task after simulation completion.
 
