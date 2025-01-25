@@ -84,6 +84,9 @@ struct ManualResume <: AbstractManualCommand end
     CloseLong
     Short
     CloseShort
+    CreateStop
+    MoveStop
+    CancelStop
 end
 
 # """
