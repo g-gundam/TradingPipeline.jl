@@ -25,10 +25,15 @@ include("pnl.jl")
 include("report.jl")
 include("explore.jl")
 export report
+
 include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("strategies/hma2.jl")
+
+include("abstract_stop.jl")
+include("stops/static.jl")
+
 export load_strategy
 include("hsm_types.jl")
 include("candles.jl")
