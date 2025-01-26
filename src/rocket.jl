@@ -369,6 +369,13 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
         XO.send!(session, XO.SimulatorMarketSell(1.0))
     elseif decision == TradeDecision.CloseShort
         XO.send!(session, XO.SimulatorMarketBuy(1.0))
+    elseif decision == TradeDecision.CancelStop
+        # id = subject.stop_id
+        # if !ismissing(id)
+        #     XO.send!(session, XO.SimulatorStopMarketCancel(id))
+        # end
+    else
+        @warn :simulator_exchange_driver message="Unhandled TradeDecision" decision
     end
 end
 
