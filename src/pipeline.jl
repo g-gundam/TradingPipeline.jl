@@ -49,6 +49,11 @@ function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}; k
     simulate_main(candle_observable, cs, ss)
 end
 
+# function simulate(candle_observable, chart_subject,
+#                   Pair{AbstractStrategySubject,Dict},
+#                   Pair{AbstractExchangeDriverSubject,Dict})
+# end
+
 function simulate_main(candle_observable, chart_subject, ss)
     candle_subject = Subject(Candle)
     global strategy_subject = ss # XXX: FUUUUUUUU
