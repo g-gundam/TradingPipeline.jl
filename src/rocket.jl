@@ -372,6 +372,15 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
     end
 end
 
+function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::TradeDecision.T, price::Float64)
+    session = subject.session
+    if decision == TradeDecision.MoveStop
+        # get the stop order
+        # id = subject.stop_id
+        # XO.send!(session, XO.SimulatorStopMarketUpdate(id, price))
+    end
+end
+
 
 
 # This receives async messages from the exchange (XO.AbstractResposne)
