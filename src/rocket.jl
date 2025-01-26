@@ -257,12 +257,54 @@ end
 
 @kwdef mutable struct StopSubject <: Rocket.AbstractSubject{Any}
     policy::AbstractStop
+    in_trade::Bool = false
+    auto_setup::Bool = true
+    auto_cancel::Bool = true
     subscribers::Vector = []
 end
 
-function Rocket.on_subscribe!(subject::StopSubject, actor)
+function Rocket.on_subscribe!(stop::StopSubject, actor)
     push!(subject.subscribers, actor)
     return voidTeardown
+end
+
+## Inputs
+
+# raw candle from candle_subject
+function Rocket.on_next!(stop::StopSubject, c::Candle)
+    if !stop.in_trade
+        return
+    end
+    # should_move_stop(stop.policy)
+    # next!(sub, TradeDecision.MoveStop, new_stop) # this is a new signature
+end
+
+# complete candle from chart_subject
+function Rocket.on_next!(stop::StopSubject, t::Tuple{Symbol, Candle})
+    if !stop.in_trade
+        return
+    end
+end
+
+#
+function Rocket.on_next!(stop::StopSubject, state::HSM.AbstractHsmState)
+    @info :stop state
+    if state == Neutral
+        stop.in_trade = false
+        if !stop.auto_cancel
+            for sub in stop.subscribers
+                next!(sub, TradeDecision.CancelStop)
+            end
+        end
+    end
+    if state == InLong || state == InShort
+        stop.in_trade = true
+        if !stop.auto_setup
+            for sub in stop.subscribers
+                next!(sub, TradeDecision.CreateStop)
+            end
+        end
+    end
 end
 
 
