@@ -345,6 +345,7 @@ abstract type AbstractExchangeDriverSubject{T} <: AbstractSubject{T} end
 
 @kwdef struct SimulatorExchangeDriverSubject <: AbstractExchangeDriverSubject{Any}
     session::XO.AbstractSession
+    stop_id::Union{Missing,UUID} = missing
     subscribers::Vector = []
 end
 
@@ -370,10 +371,10 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
     elseif decision == TradeDecision.CloseShort
         XO.send!(session, XO.SimulatorMarketBuy(1.0))
     elseif decision == TradeDecision.CancelStop
-        # id = subject.stop_id
-        # if !ismissing(id)
-        #     XO.send!(session, XO.SimulatorStopMarketCancel(id))
-        # end
+        id = subject.stop_id
+        if !ismissing(id)
+            XO.send!(session, XO.SimulatorStopMarketCancel(id))
+        end
     else
         @warn :simulator_exchange_driver message="Unhandled TradeDecision" decision
     end
@@ -383,8 +384,10 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
     session = subject.session
     if decision == TradeDecision.MoveStop
         # get the stop order
-        # id = subject.stop_id
-        # XO.send!(session, XO.SimulatorStopMarketUpdate(id, price))
+        id = subject.stop_id
+        if !ismissing(id)
+            XO.send!(session, XO.SimulatorStopMarketUpdate(id, price))
+        end
     end
 end
 
