@@ -392,6 +392,11 @@ function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, decision::Trad
     end
 end
 
+function Rocket.on_next!(subject::SimulatorExchangeDriverSubject, fill::ExchangeFill)
+    # look for a fill that says a stop loss was created
+    # subject.stop_id = fill.id
+end
+
 
 
 # This receives async messages from the exchange (XO.AbstractResposne)
