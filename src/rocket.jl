@@ -55,6 +55,9 @@ julia> subtypes(TradingPipeline.AbstractExchangeResponse)
 """
 abstract type AbstractExchangeResponse end
 struct ExchangeFill <: AbstractExchangeResponse end
+struct CreateStopMarketOrder <: AbstractExchangeResponse
+    id::UUID
+end
 
 """
 An **AbstractManualCommand** represents a manual intervention from a human to the StrategySubject.
