@@ -58,6 +58,7 @@ struct ExchangeFill <: AbstractExchangeResponse end
 struct CreateStopMarketOrder <: AbstractExchangeResponse
     id::UUID
 end
+# XXX: Name these better or put them under a module.
 
 """
 An **AbstractManualCommand** represents a manual intervention from a human to the StrategySubject.
