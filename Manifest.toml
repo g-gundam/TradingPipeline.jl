@@ -2,7 +2,7 @@
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "05c7c08ed59825c414818f4462518dc635bab21f"
+project_hash = "a4528c36ceea4369c23534187d62ccf291dbfd03"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -324,6 +324,11 @@ git-tree-sha1 = "f02b56007b064fbfddb4c9cd60161b6dd0f40df3"
 uuid = "e6f89c97-d47a-5376-807f-9c37f3926c36"
 version = "1.1.0"
 
+[[deps.MIMEs]]
+git-tree-sha1 = "1833212fd6f580c20d4291da9c1b4e8a655b128e"
+uuid = "6c6e2e6c-3030-632d-7369-2d6c69616d65"
+version = "1.0.0"
+
 [[deps.MacroTools]]
 deps = ["Markdown", "Random"]
 git-tree-sha1 = "2fa9ee3e63fd3a4f7a9a4f4744a52f4856de82df"
@@ -415,6 +420,28 @@ git-tree-sha1 = "12f1439c4f986bb868acda6ea33ebc78e19b95ad"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
 version = "1.7.0"
 
+[[deps.Oxygen]]
+deps = ["DataStructures", "Dates", "HTTP", "JSON3", "MIMEs", "Reexport", "RelocatableFolders", "Sockets", "Statistics", "StructTypes"]
+git-tree-sha1 = "ffc372f896b82c9d4e66206ac6458901a3289d13"
+uuid = "df9a0d86-3283-4920-82dc-4555fc0d1d8b"
+version = "1.6.1"
+
+    [deps.Oxygen.extensions]
+    BonitoExt = "Bonito"
+    CairoMakieExt = "CairoMakie"
+    MustacheExt = "Mustache"
+    OteraEngineExt = "OteraEngine"
+    ProtoBufExt = "ProtoBuf"
+    WGLMakieExt = ["WGLMakie", "Bonito"]
+
+    [deps.Oxygen.weakdeps]
+    Bonito = "824d6782-a2ef-11e9-3a09-e5662e0c26f8"
+    CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+    Mustache = "ffc61752-8dc7-55ee-8c37-f3e9cdd09e70"
+    OteraEngine = "b2d7f28f-acd6-4007-8b26-bc27716e5513"
+    ProtoBuf = "3349acd9-ac6a-5e09-bcdb-63829b23a429"
+    WGLMakie = "276b4fcb-3e11-5398-bf8b-a0c2d153d008"
+
 [[deps.Parsers]]
 deps = ["Dates", "PrecompileTools", "UUIDs"]
 git-tree-sha1 = "8489905bcdbcfac64d1daa51ca07c0d8f0283821"
@@ -470,6 +497,12 @@ version = "1.11.0"
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
+
+[[deps.RelocatableFolders]]
+deps = ["SHA", "Scratch"]
+git-tree-sha1 = "ffdaf70d81cf6ff22c2b6e733c900c3321cab864"
+uuid = "05181044-ff0b-4ac5-8273-598c1e38db00"
+version = "1.0.1"
 
 [[deps.ReversedSeries]]
 deps = ["Chain", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "TidyTest"]
