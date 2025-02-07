@@ -9,7 +9,7 @@ abstract type AbstractStop end
 # Functions may be enough to express variances in behavior.
 
 struct Stop
-    initial::Any,
-    break_even::Any,
+    initial::Any
+    break_even::Any
     move_when::Function
 end
