@@ -565,13 +565,13 @@ Chain = "~0.6.0"
 CryptoMarketData = "~1.0.5"
 DataFrames = "~1.7.0"
 ExchangeOperations = "~0.0.1"
-LightweightCharts = "~2.3.1"
+LightweightCharts = "~3.0.0"
 OnlineTechnicalIndicators = "~0.1.0"
 PlutoUI = "~0.7.61"
 ReversedSeries = "~1.1.2"
 Revise = "~3.7.2"
 Rocket = "~1.8.1"
-TechnicalIndicatorCharts = "~0.6.3"
+TechnicalIndicatorCharts = "~0.6.5"
 UnPack = "~1.0.2"
 """
 
@@ -581,7 +581,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "e4b26bdf77e71fbaac73d308bae2e35c498d46a1"
+project_hash = "cc8a84b811eeec5f8dfd3583fd2d947a3aad94ea"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -910,9 +910,9 @@ version = "1.18.0+0"
 
 [[deps.LightweightCharts]]
 deps = ["Dates", "NanoDates", "Serde"]
-git-tree-sha1 = "fb61614325e994d09c527d8154d37610bf9fbfb4"
+git-tree-sha1 = "39639592f8bdc613adabdb9cd1c24418fb0ea5e4"
 uuid = "d6998af1-87ca-4e7f-83d4-864c79a249fa"
-version = "2.3.1"
+version = "3.0.0"
 
 [[deps.LinearAlgebra]]
 deps = ["Libdl", "OpenBLAS_jll", "libblastrampoline_jll"]
@@ -1281,9 +1281,9 @@ version = "1.10.0"
 
 [[deps.TechnicalIndicatorCharts]]
 deps = ["Chain", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "6645cca27daa7b64a410468aa76df9e8706e6142"
+git-tree-sha1 = "e92bbfd81263c48987895ccdcdad4518c9cfad7b"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.3"
+version = "0.6.5"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
