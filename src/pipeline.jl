@@ -26,6 +26,15 @@ simulate_sanity_check_failure_error = (
     simulator_session_actor = nothing,
 )
 
+# What's the signature that I want?
+# simulate(candles, strategytype=>config; positionsizefn, stoppolicy)
+function simulate(candle_observable, strategy_type::Type{<: AbstractStrategy}, strategy_options::AbstractDict;
+                  stops::Any=nothing,
+                  position_size::Any=nothing)
+    (cs, ss) = load_strategy(strategy_type; strategy_options...)
+    simulate_main(candle_observable, cs, ss)
+end
+
 """$(TYPEDSIGNATURES)
 Run a strategy on the simulator using the given `candle_observable`.
 
