@@ -6,3 +6,4 @@
 .dir-locals.el
 data
 notebooks/_*.jl
+src/scratch.jl
