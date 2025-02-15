@@ -1,0 +1,22 @@
+#spacing: 55
+#arrowSize: 0.6
+#fontSize: 14
+#acyclicer: 
+#ranker: longest-path
+#leading: 0.1
+#lineWidth: 2
+#gravity: 1
+#padding: 16
+#bendSize: 0.5
+
+# initial stop
+[<state> neutral] - [<label> position opened] -> [<state> want_initial_stop] o-> [<state> stop_set]
+
+# move stop
+[stop_set] - [<label> move condition] -> [<state> want_move] o-> [stop_set]
+
+# stopped out
+[stop_set] - [<label> stopped out] -> [neutral]
+
+# position closed
+[stop_set] - [<label> position closed] -> [<state> want_cancel_after_close] o-> [neutral]
