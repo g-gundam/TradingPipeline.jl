@@ -92,6 +92,12 @@ hsm
 # Split hsm.jl into hsm_types.jl and hsm_instance.jl because rocket.jl needed
 # to see the types to implement its features.
 
+# [2024-12-03 Tue 10:56]
+# I discovered that the macro approach won't work, because HSM.on_event! dispatches
+# on type which will be the same no matter what the instance is.  This library
+# needs a redesign to accomodate more than one instance of the same state machine
+# in the same process.
+
 # [2024-11-30 Sat 14:49]
 # What if I need another instance of a state machine?
 # - I could use macros to generete more on_event! methods.
@@ -100,8 +106,3 @@ hsm
 #
 # Everything from '# instantiate all the states' on down needs to be in the macro.
 
-# [2024-12-03 Tue 10:56]
-# I discovered that the macro approach won't work, because HSM.on_event! dispatches
-# on type which will be the same no matter what the instance is.  This library
-# needs a redesign to accomodate more than one instance of the same state machine
-# in the same process.
