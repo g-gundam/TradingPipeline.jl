@@ -78,6 +78,16 @@ hsm
 #   HSM.handle_event!(hsm, CloseLongSignal())
 #   HSM.handle_event!(hsm, Fill())
 
+# [2025-02-15 Sat 18:42]
+# Since these state machines are singletons, maybe the rocket subjects they work
+# with should also be singletons.
+# Furthermore, make those subjects sufficiently mutable to that behaviors can
+# be swapped out.
+# In the case of strategy_subject, instead of instantiating a new subject,
+# reuse the global singleton strategy_subject.
+# Ugh.  Still not ideal, but it might be less ugly than what I'm doing now
+# with repeated includes.
+
 # [2024-12-07 Sat 23:49]
 # Split hsm.jl into hsm_types.jl and hsm_instance.jl because rocket.jl needed
 # to see the types to implement its features.
