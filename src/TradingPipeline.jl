@@ -32,6 +32,7 @@ include("strategies/hma.jl")
 include("strategies/hma2.jl")
 
 include("abstract_stop.jl")
+include("stops.jl")
 include("stops/static.jl")
 
 export load_strategy
