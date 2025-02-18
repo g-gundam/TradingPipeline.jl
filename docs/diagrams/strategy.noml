@@ -1,0 +1,13 @@
+
+
+[<frame> strategy |
+[<start>] -> [neutral]
+[neutral] ->long signal [want to long]
+[neutral] ->short signal [want to short]
+[want to long] ->fill [long]
+[want to short] ->fill [short]
+[long] ->close signal [want to close long]
+[short] ->close signal [want to close short]
+[want to close long] ->fill [neutral]
+[want to close short] ->fill [neutral]
+]
