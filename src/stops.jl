@@ -8,7 +8,7 @@ macro stop_state(name)
     return :(
         mutable struct $name <: HSM.AbstractHsmState
             state_info::HSM.HsmStateInfo
-            subject::Rocket.AbstractSubject
+            subject::Union{Nothing,Rocket.AbstractSubject} # XXX: I wonder if I really need this.
 
 	    $name(parent, subject) = new(HSM.HsmStateInfo(parent), subject)
 	end
@@ -29,5 +29,46 @@ struct PositionOpened <: HSM.AbstractHsmEvent end
 struct MoveCondition <: HSM.AbstractHsmEvent end
 struct StoppedOut <: HSM.AbstractHsmEvent end
 struct PositionClosed <: HSM.AbstractHsmEvent end
+
+# state instances
+hsm = StopLossStateMachine(nothing, nothing)
+neutral = Neutral(hsm, nothing)
+want_initial_stop = WantInitialStop(hsm, nothing)
+stop_set = StopSet(hsm, nothing)
+want_move = WantMove(hsm, nothing)
+want_cancel_after_close = WantCancelAfterClose(hsm, nothing)
+
+# transitions
+function HSM.on_initialize!(state::StopLossStateMachine)
+    HSM.transition_to_state!(hsm, neutral)
+end
+
+function HSM.on_event!(state::Neutral, event::PositionOpened)
+    HSM.transition_to_state!(hsm, want_initial_stop)
+end
+
+function HSM.on_event!(state::WantInitialStop, event::Fill)
+    HSM.transition_to_state!(hsm, stop_set)
+end
+
+function HSM.on_event!(state::StopSet, event::MoveCondition)
+    HSM.transition_to_state!(hsm, want_move)
+end
+
+function HSM.on_event!(state::WantMove, event::Fill)
+    HSM.transition_to_state!(hsm, stop_set)
+end
+
+function HSM.on_event!(state::StopSet, event::StoppedOut)
+    HSM.transition_to_state!(hsm, neutral)
+end
+
+function HSM.on_event!(state::StopSet, event::PositionClosed)
+    HSM.transition_to_state!(hsm, want_cancel_after_close)
+end
+
+function HSM.on_event!(state::WantCancelAfterClose, event::Fill)
+    HSM.transition_to_state!(hsm, neutral)
+end
 
 end
