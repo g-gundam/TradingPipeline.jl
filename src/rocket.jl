@@ -261,7 +261,7 @@ end
 
 
 @kwdef mutable struct StopSubject <: Rocket.AbstractSubject{Any}
-    policy::AbstractStop
+    policy::Any
     in_trade::Bool = false
     auto_setup::Bool = true
     auto_cancel::Bool = true
