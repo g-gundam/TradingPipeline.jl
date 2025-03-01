@@ -46,30 +46,37 @@ end
 
 function HSM.on_event!(state::Neutral, event::PositionOpened)
     HSM.transition_to_state!(hsm, want_initial_stop)
+    return true
 end
 
 function HSM.on_event!(state::WantInitialStop, event::Fill)
     HSM.transition_to_state!(hsm, stop_set)
+    return true
 end
 
 function HSM.on_event!(state::StopSet, event::MoveCondition)
     HSM.transition_to_state!(hsm, want_move)
+    return true
 end
 
 function HSM.on_event!(state::WantMove, event::Fill)
     HSM.transition_to_state!(hsm, stop_set)
+    return true
 end
 
 function HSM.on_event!(state::StopSet, event::StoppedOut)
     HSM.transition_to_state!(hsm, neutral)
+    return true
 end
 
 function HSM.on_event!(state::StopSet, event::PositionClosed)
     HSM.transition_to_state!(hsm, want_cancel_after_close)
+    return true
 end
 
 function HSM.on_event!(state::WantCancelAfterClose, event::Fill)
     HSM.transition_to_state!(hsm, neutral)
+    return true
 end
 
 end
