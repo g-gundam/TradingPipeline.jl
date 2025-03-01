@@ -40,6 +40,7 @@ want_cancel_after_close = WantCancelAfterClose(hsm, nothing)
 
 # transitions
 function HSM.on_initialize!(state::StopLossStateMachine)
+    @warn "initialize"
     HSM.transition_to_state!(hsm, neutral)
 end
 
