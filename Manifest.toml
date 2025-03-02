@@ -514,9 +514,9 @@ version = "1.1.2"
 
 [[deps.Rocket]]
 deps = ["DataStructures", "Sockets", "Unrolled"]
-git-tree-sha1 = "c405231d77d3ff6c9eb6dc2da48147e761888ac1"
+git-tree-sha1 = "af6e944256dc654a534082f08729afc1189933e4"
 uuid = "df971d30-c9d6-4b37-b8ff-e965b2cb3a40"
-version = "1.8.1"
+version = "1.8.2"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -640,9 +640,9 @@ version = "1.12.0"
 
 [[deps.TechnicalIndicatorCharts]]
 deps = ["Chain", "DataFrames", "DataFramesMeta", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "e92bbfd81263c48987895ccdcdad4518c9cfad7b"
+git-tree-sha1 = "af4fcaf5f32f1bdc7cb1bcff8c8af9ed3631897f"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.5"
+version = "0.6.6"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
