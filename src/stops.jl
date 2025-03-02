@@ -31,11 +31,11 @@ struct StoppedOut <: HSM.AbstractHsmEvent end
 struct PositionClosed <: HSM.AbstractHsmEvent end
 
 # state instances
-hsm = StopLossStateMachine(nothing, nothing)
-neutral = Neutral(hsm, nothing)
-want_initial_stop = WantInitialStop(hsm, nothing)
-stop_set = StopSet(hsm, nothing)
-want_move = WantMove(hsm, nothing)
+hsm                     = StopLossStateMachine(nothing, nothing)
+neutral                 = Neutral(hsm, nothing)
+want_initial_stop       = WantInitialStop(hsm, nothing)
+stop_set                = StopSet(hsm, nothing)
+want_move               = WantMove(hsm, nothing)
 want_cancel_after_close = WantCancelAfterClose(hsm, nothing)
 
 # transitions
