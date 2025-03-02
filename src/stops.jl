@@ -38,6 +38,19 @@ stop_set                = StopSet(hsm, nothing)
 want_move               = WantMove(hsm, nothing)
 want_cancel_after_close = WantCancelAfterClose(hsm, nothing)
 
+"""
+Mutate the subject of all TP.Stops state instances.
+This is my workaround for state machines being singletons.
+"""
+function set_subject!(subject::Rocket.AbstractSubject)
+    hsm.subject                     = subject
+    neutral.subject                 = subject
+    want_initial_stop.subject       = subject
+    stop_set.subject                = subject
+    want_move.subject               = subject
+    want_cancel_after_close.subject = subject
+end
+
 # transitions
 function HSM.on_initialize!(state::StopLossStateMachine)
     @warn "initialize"
