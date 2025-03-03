@@ -2,7 +2,7 @@
 
 julia_version = "1.11.3"
 manifest_format = "2.0"
-project_hash = "ac9a9a826a42c52559640591e1538341f5631d70"
+project_hash = "2267a95b7880f93ca9fbece43f03bf6a567e2518"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -713,9 +713,9 @@ version = "0.1.5"
 
 [[deps.Visor]]
 deps = ["DataStructures", "Dates", "Logging", "PrecompileTools", "UUIDs"]
-git-tree-sha1 = "e30d107271938d64f9dbc31bd5b64be70748a34f"
+git-tree-sha1 = "c0e5fadbb3b54f48644442a3e66f404dc9e98df4"
 uuid = "cf786855-3531-4b86-ba6e-3e33dce7dcdb"
-version = "0.7.4"
+version = "0.8.0"
 
 [[deps.WeakRefStrings]]
 deps = ["DataAPI", "InlineStrings", "Parsers"]
