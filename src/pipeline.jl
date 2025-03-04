@@ -10,9 +10,8 @@
 #
 # test
 
-# XXX: I'm so sorry.
 # `strategy_subject` is global so that the `include` of hsm_instance.jl works.
-global strategy_subject
+strategy_subject::Union{Rocket.AbstractSubject, Nothing} = nothing
 
 "`simulate_sanity_check_failure_error` is a tuple filled with a lot of nothing values so that
 code that's @unpack'ing return values from `simulate()` don't crash."
