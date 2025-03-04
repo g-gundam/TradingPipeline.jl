@@ -24,10 +24,10 @@ end
 @stop_state WantCancelAfterClose
 
 # events
-struct Fill <: HSM.AbstractHsmEvent end
+struct Fill           <: HSM.AbstractHsmEvent end
 struct PositionOpened <: HSM.AbstractHsmEvent end
-struct MoveCondition <: HSM.AbstractHsmEvent end
-struct StoppedOut <: HSM.AbstractHsmEvent end
+struct MoveCondition  <: HSM.AbstractHsmEvent end
+struct StoppedOut     <: HSM.AbstractHsmEvent end
 struct PositionClosed <: HSM.AbstractHsmEvent end
 
 # state instances
