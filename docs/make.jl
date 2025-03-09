@@ -14,7 +14,7 @@ makedocs(;
     #     assets=String[],
     # ),
     format=MarkdownVitepress(;
-        repo="https://github.com/g-gundam/TradingPipeline.jl"
+        repo="github.com/g-gundam/TradingPipeline.jl"
     ),
     pages=[
         "Home" => "index.md",
