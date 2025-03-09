@@ -10,5 +10,5 @@ Documentation for [TradingPipeline](https://github.com/g-gundam/TradingPipeline.
 ```
 
 ```@autodocs
-Modules = [TradingPipeline]
+Modules = [TradingPipeline, TradingPipeline.Stops]
 ```
