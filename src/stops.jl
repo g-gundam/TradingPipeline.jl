@@ -38,7 +38,8 @@ stop_set                = StopSet(hsm, nothing)
 want_move               = WantMove(hsm, nothing)
 want_cancel_after_close = WantCancelAfterClose(hsm, nothing)
 
-"""
+"""    set_subject!(subject::Rocket.AbstractSubject)
+
 Mutate the subject of all TP.Stops state instances.
 This is my workaround for state machines being singletons.
 """
