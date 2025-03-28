@@ -13,6 +13,9 @@
 # `strategy_subject` is global so that the `include` of hsm_instance.jl works.
 strategy_subject::Union{Rocket.AbstractSubject, Nothing} = nothing
 
+# XXX: `stop_subject` is also global for similar reasons -- HSMs are singletons so I have to do it this weird way. 
+stop_subject::Union{Rocket.AbstractSubject, Nothing} = StopSubject(;policy=nothing, in_trade=false, auto_setup=false, auto_cancel=false)
+
 "`simulate_sanity_check_failure_error` is a tuple filled with a lot of nothing values so that
 code that's @unpack'ing return values from `simulate()` don't crash."
 simulate_sanity_check_failure_error = (
