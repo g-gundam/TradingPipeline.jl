@@ -117,3 +117,10 @@ function simulate_main(candle_observable, chart_subject, ss)
      strategy_subject,
      simulator_session_actor)
 end
+
+# What do I need?
+# - [candle_observable] the raw candle data to test on
+# - [??] a strategy and its configuration
+# - [??] a stop policy and its configuration
+function backtest(candle_observable)
+end
