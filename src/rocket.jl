@@ -269,7 +269,7 @@ end
 end
 
 function Rocket.on_subscribe!(stop::StopSubject, actor)
-    push!(subject.subscribers, actor)
+    push!(stop.subscribers, actor)
     return voidTeardown
 end
 
