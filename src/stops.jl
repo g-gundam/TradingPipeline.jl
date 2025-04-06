@@ -4,6 +4,16 @@ using HierarchicalStateMachines
 import HierarchicalStateMachines as HSM
 using Rocket
 
+
+
+@kwdef struct Policy
+    # initial_stop
+    # should_break_even
+    # should_move_stop
+end
+
+
+
 macro stop_state(name)
     return :(
         mutable struct $name <: HSM.AbstractHsmState
@@ -92,5 +102,9 @@ function HSM.on_event!(state::WantCancelAfterClose, event::Fill)
     HSM.transition_to_state!(hsm, neutral)
     return true
 end
+
+
+
+# Utility Functions
 
 end
