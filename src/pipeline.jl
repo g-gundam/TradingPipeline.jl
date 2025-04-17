@@ -122,5 +122,7 @@ end
 # - [candle_observable] the raw candle data to test on
 # - [??] a strategy and its configuration
 # - [??] a stop policy and its configuration
-function backtest(candle_observable)
+function backtest(candle_observable, strategy, stops)
+    # Maybe strategy and stops can be a tuple of (Strategy, Configuration) and (StopPolicy, Configuration).
+    # Given those configs, I can construct all the auxiliary data structures that support them.
 end
