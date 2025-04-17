@@ -6,11 +6,7 @@ using Rocket
 
 
 
-@kwdef struct Policy
-    # initial_stop
-    # should_break_even
-    # should_move_stop
-end
+# TODO: Drop in the Plan struct + friends I've been experimenting with.
 
 
 
