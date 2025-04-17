@@ -5,7 +5,7 @@ using UnPack
 
 macro strategy_state(name)
     return :(
-        struct $name <: HSM.AbstractHsmState
+        mutable struct $name <: HSM.AbstractHsmState
             state_info::HSM.HsmStateInfo
             subject::Rocket.AbstractSubject
 
