@@ -1,5 +1,7 @@
 module TradingPipeline
 
+## Dependencies
+
 # from the wider ecosystem
 using Chain
 using DataFrames
@@ -20,8 +22,17 @@ using TechnicalIndicatorCharts
 using ReversedSeries
 import ExchangeOperations as XO
 
-include("util.jl")
+## module TradingPipeline.PNL
+
+# - I wanted to hide its types away and only use this functionality through @pnl and @pnls.
+module PNL
 include("pnl.jl")
+end
+using .PNL: @pnl, @pnls
+
+## module TradingPipeline (continued)
+
+include("util.jl")
 include("report.jl")
 include("explore.jl")
 export report
@@ -44,7 +55,7 @@ end
 
 
 
-# REPL work
+## REPL work
 
 #=
 
