@@ -108,6 +108,7 @@ function simulate_main(candle_observable, chart_subject, ss)
     # This will put everything in motion.
     subscribe!(candle_observable, candle_subject)
 
+    # Return a named tuple
     (;
      simulator_session,
      hsm,
