@@ -1,5 +1,3 @@
-module Stops
-
 using HierarchicalStateMachines
 import HierarchicalStateMachines as HSM
 using Rocket
@@ -97,10 +95,4 @@ end
 function HSM.on_event!(state::WantCancelAfterClose, event::Fill)
     HSM.transition_to_state!(hsm, neutral)
     return true
-end
-
-
-
-# Utility Functions
-
 end

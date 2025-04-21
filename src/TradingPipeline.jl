@@ -30,6 +30,12 @@ include("pnl.jl")
 end
 using .PNL: @pnl, @pnls
 
+## module TradingPipeline.Stops
+
+module Stops
+include("stops.jl")
+end
+
 ## module TradingPipeline (continued)
 
 include("util.jl")
@@ -42,7 +48,6 @@ include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("strategies/hma2.jl")
 
-include("stops.jl")
 
 export load_strategy
 include("hsm_types.jl")
