@@ -29,11 +29,19 @@ module PNL
 include("pnl.jl")
 end
 using .PNL: @pnl, @pnls
+export @pnl, @pnls
 
 ## module TradingPipeline.Stops
 
 module Stops
 include("stops.jl")
+end
+
+## module TradingPipeline.Strategies
+
+module Strategies
+# every state machine needs to have its own namespace to keep its states from
+# cluttering up the main namespace.
 end
 
 ## module TradingPipeline (continued)
