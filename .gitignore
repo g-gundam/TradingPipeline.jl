@@ -3,6 +3,7 @@
 *.jl.mem
 /docs/Manifest.toml
 /docs/build/
+/docs/node_modules/
 .dir-locals.el
 data
 notebooks/_*.jl
