@@ -30,5 +30,3 @@ struct OpenLongSignal <: HSM.AbstractHsmEvent end
 struct CloseLongSignal <: HSM.AbstractHsmEvent end
 struct OpenShortSignal <: HSM.AbstractHsmEvent end
 struct CloseShortSignal <: HSM.AbstractHsmEvent end
-
-const TP = TradingPipeline
