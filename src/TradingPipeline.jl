@@ -36,12 +36,14 @@ export @pnl, @pnls
 module Stops
 include("stops.jl")
 end
+# TODO: What should be exported from TP.Stops?
 
 ## module TradingPipeline.Strategies
 
 module Strategies
 # every state machine needs to have its own namespace to keep its states from
 # cluttering up the main namespace.
+include("hsm_types.jl")
 end
 
 ## module TradingPipeline (continued)
