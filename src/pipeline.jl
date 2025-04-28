@@ -67,11 +67,8 @@ end
 
 function simulate_main(candle_observable, chart_subject, ss)
     candle_subject = Subject(Candle)
-    global strategy_subject = ss # XXX: FUUUUUUUU
-    src = dirname(@__FILE__)
-    # INFO: It worked, but I hate having to do this.
-    # INFO: If HSM gets a v2, I hope I can remove this.
-    hsm = include("$(src)/hsm_instance.jl") # XXX: I wish I didn't have to do this.
+    global strategy_subject = ss # Unfortunate.
+    set_subject!(ss)
     strategy_subject.hsm = hsm
     HSM.transition_to_state!(hsm, hsm)
     sanity_check = typeof(HSM.active_state(hsm))
