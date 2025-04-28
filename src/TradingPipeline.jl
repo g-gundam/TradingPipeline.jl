@@ -44,6 +44,7 @@ module Strategies
 # every state machine needs to have its own namespace to keep its states from
 # cluttering up the main namespace.
 include("hsm_types.jl")
+include("hsm_instance.jl")
 end
 
 ## module TradingPipeline (continued)
@@ -61,6 +62,7 @@ include("strategies/hma2.jl")
 
 export load_strategy
 include("hsm_types.jl")
+include("hsm_instance.jl")
 include("candles.jl")
 include("rocket.jl")
 include("pipeline.jl")

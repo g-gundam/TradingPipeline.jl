@@ -1,13 +1,13 @@
 # XXX: strategy_subject must be in scope at this point.
 # XXX: I hate this, but I don't see another way.
-hsm                 = MarketOrderStrategyStateMachine(nothing, strategy_subject)
-neutral             = Neutral(hsm, strategy_subject)
-want_to_long        = WantToLong(hsm, strategy_subject)
-in_long             = InLong(hsm, strategy_subject)
-want_to_close_long  = WantToCloseLong(hsm, strategy_subject)
-want_to_short       = WantToShort(hsm, strategy_subject)
-in_short            = InShort(hsm, strategy_subject)
-want_to_close_short = WantToCloseShort(hsm, strategy_subject)
+hsm                 = MarketOrderStrategyStateMachine(nothing, nothing)
+neutral             = Neutral(hsm, nothing)
+want_to_long        = WantToLong(hsm, nothing)
+in_long             = InLong(hsm, nothing)
+want_to_close_long  = WantToCloseLong(hsm, nothing)
+want_to_short       = WantToShort(hsm, nothing)
+in_short            = InShort(hsm, nothing)
+want_to_close_short = WantToCloseShort(hsm, nothing)
 
 # initialize
 function HSM.on_initialize!(state::MarketOrderStrategyStateMachine)
@@ -65,7 +65,16 @@ function HSM.on_event!(state::WantToCloseShort, event::Fill)
     return true
 end
 
-hsm
+function set_subject!(subject::Rocket.AbstractSubject)
+    hsm.subject                 = subject
+    neutral.subject             = subject
+    want_to_long.subject        = subject
+    in_long.subject             = subject
+    want_to_close_long.subject  = subject
+    want_to_short.subject       = subject
+    in_short.subject            = subject
+    want_to_close_short.subject = subject
+end
 
 # How to start the machine
 #   HSM.transition_to_state!(hsm, hsm)
