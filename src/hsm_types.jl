@@ -7,7 +7,7 @@ macro strategy_state(name)
     return :(
         mutable struct $name <: HSM.AbstractHsmState
             state_info::HSM.HsmStateInfo
-            subject::Rocket.AbstractSubject
+            subject::Union{Nothing, Rocket.AbstractSubject}
 
 	    $name(parent, subject) = new(HSM.HsmStateInfo(parent), subject)
 	end
