@@ -579,7 +579,7 @@ UnPack = "~1.0.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.4"
+julia_version = "1.11.5"
 manifest_format = "2.0"
 project_hash = "aa77d827e80f6fa8dd65cdd5e03c1072734c4299"
 
