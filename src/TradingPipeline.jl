@@ -36,13 +36,12 @@ export @pnl, @pnls
 module Stops
 include("stops.jl")
 end
-# TODO: What should be exported from TP.Stops?
 
-## module TradingPipeline.Strategies
+## module TradingPipeline.MOS
 
-module Strategies
-# every state machine needs to have its own namespace to keep its states from
-# cluttering up the main namespace.
+module MOS 
+# Market Order Strategy
+# - MarketOrderStrategyStateMachine and related symbols are isolated here in an attempt to avoid clutter.
 include("hsm_types.jl")
 include("hsm_instance.jl")
 end
@@ -61,8 +60,6 @@ include("strategies/hma2.jl")
 
 
 export load_strategy
-include("hsm_types.jl")
-include("hsm_instance.jl")
 include("candles.jl")
 include("rocket.jl")
 include("pipeline.jl")

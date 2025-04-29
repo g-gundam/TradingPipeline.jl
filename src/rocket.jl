@@ -2,6 +2,9 @@ using EnumX
 using Rocket
 using UUIDs
 
+using .MOS: MarketOrderStrategyStateMachine, Neutral, WantToLong, InLong, WantToCloseLong, WantToShort, InShort, WantToCloseShort
+using .MOS: Fill, StopFill, OpenLongSignal, CloseLongSignal, OpenShortSignal, CloseShortSignal
+
 
 
 @kwdef mutable struct ChartSubject <: Rocket.AbstractSubject{Candle}

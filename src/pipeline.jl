@@ -68,7 +68,8 @@ end
 function simulate_main(candle_observable, chart_subject, ss)
     candle_subject = Subject(Candle)
     global strategy_subject = ss # Unfortunate.
-    set_subject!(ss)
+    MOS.set_subject!(ss)
+    hsm = MOS.hsm
     strategy_subject.hsm = hsm
     HSM.transition_to_state!(hsm, hsm)
     sanity_check = typeof(HSM.active_state(hsm))
