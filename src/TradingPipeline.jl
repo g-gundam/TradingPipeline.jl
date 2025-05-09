@@ -99,4 +99,8 @@ sum(rdf.pnl)
 mean(rdf.pnl)
 mean(rdf.percent)
 
+chart = chart_subject.charts[:trend]
+v = visualize((chart, simulator_session); min_height=800)
+lwc_show(v)
+
 =#
