@@ -28,8 +28,8 @@ import ExchangeOperations as XO
 module PNL
 include("pnl.jl")
 end
-using .PNL: @pnl, @pnls
-export @pnl, @pnls
+using .PNL: @pnl, @pnls, Contracts
+export @pnl, @pnls, Contracts
 
 ## module TradingPipeline.Stops
 
@@ -86,7 +86,6 @@ pancakeswap = PancakeSwap()
 btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"))
 
 import TradingPipeline as TP
-import TradingPipeline.PNL: Contracts
 import HierarchicalStateMachines as HSM
 using TradingPipeline
 using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable
