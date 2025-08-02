@@ -37,7 +37,7 @@ pnl(
 Calculate profit/loss of a long position.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L56" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L56" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -57,7 +57,7 @@ pnl(
 Calculate profit/loss of a short position.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L72" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L72" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -74,7 +74,7 @@ qty(c::Contracts, price::Number)
 Convert contracts into the equivalent quantity of the asset being traded.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L48-L52" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L48-L52" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -91,7 +91,7 @@ qty(n::Number, price::Number)
 This just returns n since the quantity `n`.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L40-L44" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L40-L44" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -108,7 +108,7 @@ This just returns n since the quantity `n`.
 Calculate the profit/loss of a long positon.  The `quantity` and `leverage` are optional.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L105-L109" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L105-L109" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -125,7 +125,7 @@ Calculate the profit/loss of a long positon.  The `quantity` and `leverage` are 
 Calculate the profit/loss of a short positon.  The `quantity` and `leverage` are optional.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pnl.jl#L136-L140" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pnl.jl#L136-L140" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 

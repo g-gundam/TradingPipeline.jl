@@ -16,7 +16,8 @@ const baseTemp = {
 
 const navTemp = {
   nav: [
-{ text: 'Home', link: '/index' }
+{ text: 'Home', link: '/index' },
+{ text: 'PNL', link: '/pnl' }
 ]
 ,
 }
@@ -89,7 +90,8 @@ export default defineConfig({
     },
     nav,
     sidebar: [
-{ text: 'Home', link: '/index' }
+{ text: 'Home', link: '/index' },
+{ text: 'PNL', link: '/pnl' }
 ]
 ,
     editLink: { pattern: "https://github.com/g-gundam/TradingPipeline.jl/edit/main/docs/src/:path" },

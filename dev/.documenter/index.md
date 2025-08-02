@@ -35,7 +35,7 @@ Documentation for [TradingPipeline](https://github.com/g-gundam/TradingPipeline.
 `simulate_sanity_check_failure_error` is a tuple filled with a lot of nothing values so that code that&#39;s @unpack&#39;ing return values from `simulate()` don&#39;t crash.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pipeline.jl#L19-L21" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pipeline.jl#L19-L21" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -54,7 +54,7 @@ julia> subtypes(TradingPipeline.AbstractExchangeResponse)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/rocket.jl#L47-L58" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/rocket.jl#L47-L58" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -73,7 +73,7 @@ julia> subtypes(TradingPipeline.AbstractExchangeResponse)
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/rocket.jl#L66-L74" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/rocket.jl#L66-L74" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -94,7 +94,7 @@ visualize(
 Let&#39;s see if I can visualize trades on top of a chart.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/report.jl#L65" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/report.jl#L65" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -118,7 +118,7 @@ around(
 Return a few rows before and after the given timestamp `ts` in the DataFrame `df`.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/explore.jl#L9" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/explore.jl#L9" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -138,7 +138,7 @@ The decide method takes the current strategy and the current state according to 
 There are decide methods for every state in the state machine.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/rocket.jl#L151-L163" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/rocket.jl#L151-L163" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -150,7 +150,7 @@ There are decide methods for every state in the state machine.
 Initialize a long-only simple golden cross strategy.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/strategies/goldencross.jl#L26-L28" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/strategies/goldencross.jl#L26-L28" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -164,7 +164,7 @@ Initialize a long-only hma strategy.
   
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/strategies/hma.jl#L20-L24" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/strategies/hma.jl#L20-L24" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -182,7 +182,7 @@ percent_diff(a, b) -> Any
 Return the percent difference between `a` and `b`.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/util.jl#L3-L7" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/util.jl#L3-L7" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -196,7 +196,7 @@ report(session::XO.SimulatorSession) -&gt; DataFrame
 Return a list of trades that happened during the simulator session.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/report.jl#L33-L37" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/report.jl#L33-L37" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -232,7 +232,7 @@ julia> @unpack simulator_session, chart_subject = simulate(candle_observable, HM
 
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/pipeline.jl#L40" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/pipeline.jl#L40" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
@@ -249,7 +249,7 @@ set_subject!(subject::Rocket.AbstractSubject)
 Mutate the subject of all TP.Stops state instances. This is my workaround for state machines being singletons.
 
 
-<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b4d658a64a3b1bb0bdd341e56399fd4a94d7b88b/src/stops.jl#L45-L50" target="_blank" rel="noreferrer">source</a></Badge>
+<Badge type="info" class="source-link" text="source"><a href="https://github.com/g-gundam/TradingPipeline.jl/blob/b6828f6cecf768e389f2de8cfa28f0536dff1616/src/stops.jl#L45-L50" target="_blank" rel="noreferrer">source</a></Badge>
 
 </details>
 
