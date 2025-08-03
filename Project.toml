@@ -28,7 +28,7 @@ UnPack = "3a884ed6-31ef-47d7-9d2a-63182c4928ed"
 Visor = "cf786855-3531-4b86-ba6e-3e33dce7dcdb"
 
 [compat]
-Chain = "0.6.0"
+Chain = "0.6.0, 1"
 CryptoMarketData = "1.0.5"
 DataFrames = "1.7.0"
 Dates = "1.11.0"
