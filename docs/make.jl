@@ -8,6 +8,10 @@ makedocs(;
         devbranch = "main", # or master, trunk, ...
         devurl = "dev",
     ),
+    pages = [
+        Home => "index.md",
+        PNL  => "pnl.md",
+    ]
 )
 
 DocumenterVitepress.deploydocs(;
