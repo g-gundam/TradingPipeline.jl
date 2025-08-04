@@ -9,8 +9,8 @@ makedocs(;
         devurl = "dev",
     ),
     pages = [
-        Home => "index.md",
-        PNL  => "pnl.md",
+        "Home" => "index.md",
+        "PNL"  => "pnl.md",
     ]
 )
 
