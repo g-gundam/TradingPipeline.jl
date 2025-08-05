@@ -8,16 +8,15 @@ CurrentModule = TradingPipeline
 - DocumenterVitepress.jl generates very good-looking output.
 
 
-## Live Reloading Saga
+## Live Reloading SAGA
 
 - Live-reloading doesn't work as documented.
   + It's almost there, but not quite.
   + It can't serve the js and css assets.
   + However, it does live reload the HTML parts.
   
-## hey hey hey
+## Holy fucking shit.
 
-- Holy fucking shit.
 - It is so hacky, but I made it work.
   + servedocs() starts a LiveSerever
   + then I run another LiveServer, but the two servers share state, and the config I give the second one overrides the first LiveServer.
