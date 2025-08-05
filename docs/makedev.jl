@@ -8,13 +8,13 @@ include("shared.jl")
 @info "[makedocs]"
 makedocs(; md_local...)
 @info "[servedocs]"
-sd_pid = Threads.@spawn servedocs(foldername=pwd())
-ls_pid = nothing
-@async begin
-    sleep(8)
-    global ls_pid = Threads.@spawn LiveServer.serve(dir = "./build/1")
-    @info "[LiveServer] reconfigured"
-end
+sd_pid = Threads.@spawn servedocs(foldername=pwd(), buildfoldername="build/1")
+# ls_pid = nothing
+# @async begin
+#     sleep(8)
+#     global ls_pid = Threads.@spawn LiveServer.serve(dir = "./build/1")
+#     @info "[LiveServer] reconfigured"
+# end
 
 ## This is all I need to run for local documentation development.
 # if false

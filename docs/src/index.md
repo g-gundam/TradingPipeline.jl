@@ -21,6 +21,8 @@ CurrentModule = TradingPipeline
   + servedocs() starts a LiveSerever
   + then I run another LiveServer, but the two servers share state, and the config I give the second one overrides the first LiveServer.
   + Finally, I added a userscript to hack the websocket listener to make it wait a few seconds before reloading the page.
+- [2025-08-04 Mon 19:13] UPDATE: I made it less hacky after reading the source of LiveServer.servedocs and passing in a custom buildfoldername of "build/1" to match the new way of doing things.
+  + `'(testing 1 2 3)`
   
 ```julia
 include("makedev.jl")
