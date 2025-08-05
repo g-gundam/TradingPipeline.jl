@@ -6,7 +6,7 @@ CurrentModule = TradingPipeline
 
 - Hello, how are you?
 - DocumenterVitepress.jl generates very good-looking output.
-- I forgot how to do so much though.
+
 
 ## Live Reloading Saga
 
@@ -15,16 +15,46 @@ CurrentModule = TradingPipeline
   + It can't serve the js and css assets.
   + However, it does live reload the HTML parts.
   
-### Something that *does* work.
+## hey hey hey
 
-```julia-repl
-julia> ls_pid = Threads.@spawn LiveServer.serve(dir = "./build/1")
+- Holy fucking shit.
+- It is so hacky, but I made it work.
+  + servedocs() starts a LiveSerever
+  + then I run another LiveServer, but the two servers share state, and the config I give the second one overrides the first LiveServer.
+  + Finally, I added a userscript to hack the websocket listener to make it wait a few seconds before reloading the page.
+  
+```julia
+include("makedev.jl")
+# This runs a LiveSerever.
+sd_pid = Threads.@spawn servedocs(foldername=pwd())
+# This runs another LiveServer, but it also overrides the `dir` for the first one.
+# The LiveServer is effectively a singleton.
+ls_pid = Threads.@spawn LiveServer.serve(dir = "./build/1")
 ```
 
-This is handy, because I can manually rebuild like I did before, and
-the HTTP server will still work even though the previous `/build/` directory
-was blown away.  LiveServer is smart about finding the new one and continuing
-to work.
+And then the UserScript to top it all off.
+
+```javascript
+// ==UserScript==
+// @name        New script localhost
+// @namespace   Violentmonkey Scripts
+// @match       http://localhost:8000/*
+// @grant       unsafeWindow
+// @version     1.0
+// @author      -
+// @description 8/4/2025, 6:26:18 PM
+// ==/UserScript==
+
+unsafeWindow.ws_liveserver_M3sp9.onmessage = function(msg) {
+  if (msg.data === "update") {
+    console.log("update received");
+    ws_liveserver_M3sp9.close();
+    setTimeout(() => { console.log("after wait"); location.reload() }, 3000);
+  };
+};
+console.log("websocket delay hack added.")
+```
+
 
 Documentation for [TradingPipeline](https://github.com/g-gundam/TradingPipeline.jl).
 

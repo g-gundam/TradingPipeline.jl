@@ -8,8 +8,11 @@ include("shared.jl")
 makedocs(; md_local...)
 
 ## This is all I need to run for local documentation development.
-#include("makedev.jl")
-#ls_pid = Threads.@spawn servedocs(foldername=pwd())
+# if false
+#     include("makedev.jl")
+#     sd_pid = Threads.@spawn servedocs(foldername=pwd())
+#     ls_pid = Threads.@spawn LiveServer.serve(dir = "./build/1")
+# end
 
 ## Somehow, this isn't needed.
 #DocumenterVitepress.dev_docs("build", md_output_path = "")
