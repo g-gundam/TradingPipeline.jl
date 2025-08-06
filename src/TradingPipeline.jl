@@ -33,6 +33,8 @@ export @pnl, @pnls, Contracts
 
 ## module TradingPipeline.Stops
 
+# TODO: Fix this this is weird.  i should do it more like perl where the
+# module keyword is already in the included file.
 module Stops
 include("stops.jl")
 end
@@ -57,7 +59,6 @@ include("abstract_strategy.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("strategies/hma2.jl")
-
 
 export load_strategy
 include("candles.jl")
