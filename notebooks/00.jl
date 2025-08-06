@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.3
+# v0.20.13
 
 using Markdown
 using InteractiveUtils
@@ -7,7 +7,7 @@ using InteractiveUtils
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
     #! format: off
-    quote
+    return quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
@@ -85,6 +85,14 @@ md"""
 - I think that'll let me iterate faster.
 """
 
+# ╔═╡ edb93e26-eeca-48e7-a8ef-a12720d820b9
+md"""
+## Defining a subtype of TP.AbstractStrategy
+- For my style of writing strategies, setting up instances of `ReversedFrame` is the most important part.
+- Here, there is one, but in multi-timeframe analysis, there may be many.
+- The ReversedFrames are what the strategies look at to make decisions.
+"""
+
 # ╔═╡ 84d40e0c-ccd2-4e19-9770-30c01a9d26fc
 @kwdef mutable struct GenericCrossStrategy <: TP.AbstractStrategy
 	fast::Symbol
@@ -103,6 +111,12 @@ function TP.should_close_long(s::GenericCrossStrategy)
 	rf = s.rf
 	return crossed_down(rf[s.fast], rf[s.slow])
 end
+
+# ╔═╡ 34baf1dc-2109-45a9-8b6b-5770783b1c92
+md"""
+## TP.load_strategy
+- This returns a tuple con
+"""
 
 # ╔═╡ e035a1fe-dea8-48cd-a64d-a854f16ec08a
 function TP.load_strategy(::Type{GenericCrossStrategy}; 
@@ -284,7 +298,7 @@ UnPack = "~1.0.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.3"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "d122ca71a9617838834d9acdcd205a42e451a421"
 
@@ -1094,9 +1108,11 @@ version = "17.4.0+2"
 # ╠═d33d0ffb-182f-4c15-97e3-2f6f5d44ee94
 # ╟─f64c6709-4442-4e73-bc67-e6008073049b
 # ╟─cd94145a-4946-443f-aefe-f578f3be7f24
+# ╟─edb93e26-eeca-48e7-a8ef-a12720d820b9
 # ╠═84d40e0c-ccd2-4e19-9770-30c01a9d26fc
 # ╠═af955bf9-beb1-47fb-8dff-fb142bf187af
 # ╠═3db1fa19-457c-4f27-8732-4fa2fd89a3c8
+# ╟─34baf1dc-2109-45a9-8b6b-5770783b1c92
 # ╠═e035a1fe-dea8-48cd-a64d-a854f16ec08a
 # ╟─ef19c935-3270-46e3-97a0-8e874bb56643
 # ╠═d5273d6f-6585-4e70-9b0b-533e4b0c2ed5

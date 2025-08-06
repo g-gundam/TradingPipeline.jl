@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.6
+# v0.20.13
 
 using Markdown
 using InteractiveUtils
@@ -75,7 +75,7 @@ julia> save!(pancakeswap, "BTCUSD")
 pancakeswap = PancakeSwap()
 
 # ╔═╡ ed9771c3-9937-4122-9d43-c41ea94db033
-btcusd1m = load(pancakeswap, "BTCUSD"; datadir, span=Date("2023-07-01"):Date("2024-11-29"));
+btcusd1m = load(pancakeswap, "BTCUSD"; datadir, span=Date("2023-07-01"):Date("2025-07-15"));
 
 # ╔═╡ db7ee608-5c9c-40db-9ba8-40159219b95b
 candle_observable = TP.df_candles_observable(btcusd1m)
@@ -579,7 +579,7 @@ UnPack = "~1.0.2"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.11.5"
+julia_version = "1.11.6"
 manifest_format = "2.0"
 project_hash = "aa77d827e80f6fa8dd65cdd5e03c1072734c4299"
 
