@@ -1,4 +1,4 @@
-#+title: Writing Documentation
+#+title: docs
 #+startup: indent show2levels
 #+filetags: :julia:documenter:vitepress:
 
