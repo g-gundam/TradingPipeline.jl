@@ -10,8 +10,8 @@ md_default = (
     sitename = "TradingPipeline.jl",
     format   = DocumenterVitepress.MarkdownVitepress(; vite_default...),
     pages    = [
-        "Home" => "index.md",
-        "PNL"  => "pnl.md",
+        "Home"      => "index.md",
+        "Utilities" => "util.md",
     ]
 )
 
