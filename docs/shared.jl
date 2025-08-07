@@ -1,16 +1,15 @@
 ## Default Config for GitHub Actions
 
 vite_default = (
-    repo = "github.com/g-gundam/TradingPipeline.jl",
+    repo      = "github.com/g-gundam/TradingPipeline.jl",
     devbranch = "main", # or master, trunk, ...
-    devurl = "dev",
+    devurl    = "dev",
 )
 
 md_default = (
     sitename = "TradingPipeline.jl",
-    format = DocumenterVitepress.MarkdownVitepress(; vite_default...
-    ),
-    pages = [
+    format   = DocumenterVitepress.MarkdownVitepress(; vite_default...),
+    pages    = [
         "Home" => "index.md",
         "PNL"  => "pnl.md",
     ]
@@ -21,7 +20,7 @@ md_default = (
 
 vite_local = (
     ; vite_default...,
-    md_output_path = ".",
+    md_output_path  = ".",
     build_vitepress = false,
 )
 
