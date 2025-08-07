@@ -1,0 +1,139 @@
+#+title: Writing Documentation
+#+startup: indent show2levels
+#+filetags: :julia:documenter:vitepress:
+
+* Trying Out DocumenterVitepress.jl
+
+** Why?
+
+- It's so sexy.
+
+* Problems
+** The Current Docs Are Outdated
+
+- It turns out you only need one REPL and servedocs, but the existing docs were written in an era where two REPLs (or at least two threads) were necessary.
+- It also advised manually making changes to make.jl to switch between local authoring and remote deployment modes.
+  + No way was I doing that.
+
+* Solutions
+** Refactor Configuration Data
+
+- In a file called "shared.jl", define the data that is common to both local and remote use cases.
+
+#+begin_src julia
+## Default Config for GitHub Actions
+
+vite_default = (
+    repo      = "github.com/g-gundam/TradingPipeline.jl",
+    devbranch = "main", # or master, trunk, ...
+    devurl    = "dev",
+)
+
+md_default = (
+    sitename = "TradingPipeline.jl",
+    format   = DocumenterVitepress.MarkdownVitepress(; vite_default...),
+    pages    = [
+        "Home"      => "index.md",
+        "Utilities" => "util.md",
+    ]
+)
+#+end_src
+
+** Use Separate Scripts for Local vs Remote
+
+*** make.jl
+
+- This will be used by GitHub to deploy your documentation to GitHub pages.
+
+#+begin_src julia
+using TradingPipeline
+using Documenter
+using DocumenterVitepress
+
+include("shared.jl")
+
+makedocs(; md_default...)
+
+DocumenterVitepress.deploydocs(
+    ;
+    repo         = "github.com/g-gundam/TradingPipeline.jl",
+    target       = joinpath(@__DIR__, "build"),
+    branch       = "gh-pages",
+    devbranch    = "main",
+    push_preview = true,
+)
+#+end_src
+
+*** makedev.jl
+
+- This takes the shared configuration and makes derivatives of it for use with live reloading.
+- It also runs =servedocs= in a thread so that the REPL remains usable.
+
+#+begin_src julia
+using TradingPipeline
+using Documenter
+using DocumenterVitepress
+using LiveServer
+
+include("shared.jl")
+
+vite_local = (
+    ; vite_default...,
+    md_output_path  = ".",
+    build_vitepress = false,
+)
+
+md_local = merge(
+    md_default,
+    (format = DocumenterVitepress.MarkdownVitepress(; vite_local...),),
+    (clean = false,)
+);
+
+@info "[makedocs]"
+makedocs(; md_local...)
+@info "[servedocs]"
+sd_pid = Threads.@spawn servedocs(foldername=pwd(), buildfoldername="build/1")
+#+end_src
+
+- To use this while writing documentation locally, do this.
+
+#+begin_src shell
+cd docs
+julia --project
+#+end_src
+
+- Then:
+
+#+begin_src julia-repl
+julia> include("makedev.jl")
+#+end_src
+
+- Finally, visit http://localhost:8000/ to see your docs.
+- When you edit your docs, any open pages should auto-reload.
+
+** Extra Credit:  A UserScript
+
+- There's a race condition where the signal to reload the page occurs before the rebuild of the docs is finished.
+- To work around this, a userscript was written to hack the websocket handler to wait a few seconds after receiving the message before reloading the page.
+- Use [[https://violentmonkey.github.io/][Violentmonkey]] to install and run this userscript.
+
+#+begin_src javascript
+// ==UserScript==
+// @name        DocumenterVitepress.jl live reload race condition localhost
+// @namespace   Violentmonkey Scripts
+// @match       http://localhost:8000/*
+// @grant       unsafeWindow
+// @version     1.0
+// @author      -
+// @description 8/4/2025, 6:26:18 PM
+// ==/UserScript==
+
+unsafeWindow.ws_liveserver_M3sp9.onmessage = function(msg) {
+  if (msg.data === "update") {
+    console.log("update received");
+    ws_liveserver_M3sp9.close();
+    setTimeout(() => { console.log("after wait"); location.reload() }, 3000);
+  };
+};
+console.log("websocket delay hack added.")
+#+end_src
