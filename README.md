@@ -21,4 +21,4 @@
 
 ## Read More About It
 
-- https://g-gundam.github.io/
+- https://g-gundam.github.io/posts/an-introduction-to-tradingpipeline-jl/
