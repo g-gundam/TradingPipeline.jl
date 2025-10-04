@@ -2,7 +2,7 @@
 
 julia_version = "1.11.7"
 manifest_format = "2.0"
-project_hash = "b364e812178a0023ca99d9271e0fa4f80fe6294a"
+project_hash = "11014283526c853dfdf15abbe621e9a95f7053c2"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -191,9 +191,9 @@ version = "1.11.0"
 
 [[deps.HTTP]]
 deps = ["Base64", "CodecZlib", "ConcurrentUtilities", "Dates", "ExceptionUnwrapping", "Logging", "LoggingExtras", "MbedTLS", "NetworkOptions", "OpenSSL", "PrecompileTools", "Random", "SimpleBufferStream", "Sockets", "URIs", "UUIDs"]
-git-tree-sha1 = "ed5e9c58612c4e081aecdb6e1a479e18462e041e"
+git-tree-sha1 = "5e6fe50ae7f23d171f44e311c2960294aaa0beb5"
 uuid = "cd3eb016-35fb-5094-929b-558a96fad6f3"
-version = "1.10.17"
+version = "1.10.19"
 
 [[deps.HashArrayMappedTries]]
 git-tree-sha1 = "2eaa69a7cab70a52b9687c8bf950a5a93ec895ae"
@@ -399,9 +399,9 @@ version = "1.7.1"
 
 [[deps.OnlineTechnicalIndicators]]
 deps = ["Dates", "OnlineStatsBase", "Tables"]
-git-tree-sha1 = "bff61d307678117081d09d291c2e356bdfd980a7"
+git-tree-sha1 = "778e958802493156c0f340f2a91d102b47901630"
 uuid = "dc2d07fb-478f-4566-8417-81bb3e5a7af1"
-version = "0.1.0"
+version = "0.1.2"
 
 [[deps.OpenBLAS_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
@@ -656,9 +656,9 @@ version = "1.12.1"
 
 [[deps.TechnicalIndicatorCharts]]
 deps = ["Chain", "DataFrames", "DataStructures", "Dates", "DocStringExtensions", "LightweightCharts", "NanoDates", "OnlineTechnicalIndicators", "TidyTest"]
-git-tree-sha1 = "6bd25e20ce94ac98ab04505f1b550ba7d0e00470"
+git-tree-sha1 = "e4296b1a1ef7ab29e50de6a110ca3005b70a8b9b"
 uuid = "ffc6123f-ba44-4b2f-a8ce-46f3306b22af"
-version = "0.6.9"
+version = "1.0.0"
 
 [[deps.Test]]
 deps = ["InteractiveUtils", "Logging", "Random", "Serialization"]
