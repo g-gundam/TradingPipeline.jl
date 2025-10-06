@@ -117,11 +117,106 @@ function simulate_main(candle_observable, chart_subject, ss)
      simulator_session_actor)
 end
 
+# This is anything that can have the ... operator applied to it.
+Splattable = Union{AbstractDict,NamedTuple}
+
+# This is for passing strategy configurations around.
+# I'd like to find out whether I can constrain T further such that
+# T may only be a datatype that is a subtype of TP.AbstractStrategy.
+Config = Pair{T, C} where {T <: DataType, C <: Splattable}
+
 # What do I need?
 # - [candle_observable] the raw candle data to test on
 # - [??] a strategy and its configuration
 # - [??] a stop policy and its configuration
-function backtest(candle_observable, strategy, stops)
+
+"""$(TYPEDSIGNATURES)
+
+This is the successor to the old `simulate' method.
+This lets one backtest strategies just as before.
+It also lets you specify a stop-loss policy similar to
+how strategies are specified.
+
+# Example
+
+```julia-repl
+julia> strategy_config = HMA2Strategy => Dict()
+julia> stops_config = DefaultStops => Dict()
+julia> res = backtest(candle_observable, strategy_config, stops_config)
+```
+"""
+function backtest(candle_observable::AbstractSubscribable,
+                  strategy_config::Config,
+                  stops_config::Union{Nothing,Config}=nothing)
     # Maybe strategy and stops can be a tuple of (Strategy, Configuration) and (StopPolicy, Configuration).
     # Given those configs, I can construct all the auxiliary data structures that support them.
+    candle_subject = Subject(Candle)
+    (cs, ss) = load_strategy(strategy_config[1]; strategy_config[2]...)
+    chart_subject = cs
+    global strategy_subject = ss # Unfortunate.
+    MOS.set_subject!(ss)
+    hsm = MOS.hsm
+    strategy_subject.hsm = hsm
+    HSM.transition_to_state!(hsm, hsm)
+    sanity_check = typeof(HSM.active_state(hsm))
+    if sanity_check != TradingPipeline.Neutral
+        @error "wtf" sanity_check should_be=TradingPipeline.Neutral solution="Try running it again.  Subsequent runs seem OK."
+        return simulate_sanity_check_failure_error
+    end
+
+    # Connect strategy_subject => simulator_exchange_driver_subject
+    simulator_session = XO.SimulatorSession()
+    simulator_exchange_driver_subject = SimulatorExchangeDriverSubject(session=simulator_session)
+    subscribe!(strategy_subject, simulator_exchange_driver_subject)
+
+    # connect the simulator to candle_subject
+    simulator_session_actor = SimulatorSessionActor(simulator_session, missing)
+    subscribe!(candle_subject, simulator_session_actor)
+
+    # Create an observable for simulator_session.responses
+    fill_observable = iterable(simulator_session.responses)
+
+    # Connect fill_observable to something that sends fills back to the strategy_subject
+    exchange_fill_subject = ExchangeFillSubject([])
+    t_fill = @task subscribe!(fill_observable, exchange_fill_subject)
+    schedule(t_fill)
+    simulator_session_actor.t_fill = t_fill
+    subscribe!(exchange_fill_subject, strategy_subject)
+
+    # Connect chart_subject to strategy_subject
+    subscribe!(chart_subject, strategy_subject)
+
+    # Connect chart_subject to candle_subject.
+    subscribe!(candle_subject, chart_subject)
+
+    # This will put everything in motion.
+    subscribe!(candle_observable, candle_subject)
+
+    # Return a named tuple
+    (;
+     simulator_session,
+     hsm,
+     simulator_exchange_driver_subject,
+     fill_observable,
+     chart_subject,
+     strategy_subject,
+     simulator_session_actor)
+end
+
+"""$(TYPEDSIGNATURES)
+
+I'm just trying to figure out what can be passed in as kwargs.
+
+It looks like `Union{AbstractDict,NamedTuple}` might work.
+"""
+function foo(a::Int64; x::Int64=5, y::Float64=9.0)
+    @info :kwargs a x y
+end
+
+function bar(t::T) where T <: DataType
+    # Can I do the equivalent of this if-expression with just the type system?
+    if !(t <: AbstractStrategy)
+        @warn "$(typeof(t)) is not a subtype of AbstractStrategy"
+    end
+    @info :type t
 end
