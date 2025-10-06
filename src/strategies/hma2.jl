@@ -1,6 +1,6 @@
 @kwdef mutable struct HMA2Strategy <: AbstractStrategy
     # read-only market state
-    rf::ReversedFrame
+    rf::Union{Nothing,ReversedFrame} = nothing
 
     # mutable internal state
     is_late_entry::Bool = false
