@@ -1,3 +1,5 @@
+using DocStringExtensions
+
 # XXX: strategy_subject must be in scope at this point.
 # XXX: I hate this, but I don't see another way.
 hsm                 = MarketOrderStrategyStateMachine(nothing, nothing)
@@ -65,6 +67,12 @@ function HSM.on_event!(state::WantToCloseShort, event::Fill)
     return true
 end
 
+"""$(TYPEDSIGNATURES)
+
+Since hsm is a shared global object, this method is used to swap out
+the `subject` field from all the states.  In practice, `subject`
+is a strategy subject.
+"""
 function set_subject!(subject::Rocket.AbstractSubject)
     hsm.subject                 = subject
     neutral.subject             = subject
