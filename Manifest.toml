@@ -2,7 +2,7 @@
 
 julia_version = "1.11.7"
 manifest_format = "2.0"
-project_hash = "11014283526c853dfdf15abbe621e9a95f7053c2"
+project_hash = "87b2820c5b61d0e8cde6c7196bd7e4f1ded3b976"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "2d9c9a55f9c93e8887ad391fbae72f8ef55e1177"
@@ -526,7 +526,7 @@ version = "1.1.4"
 deps = ["DataStructures", "Sockets", "Unrolled"]
 git-tree-sha1 = "6e384525bdbff916782a6a640a9cea6d06b1007e"
 repo-rev = "main"
-repo-url = "https://github.com/ReactiveBayes/Rocket.jl/"
+repo-url = "https://github.com/ReactiveBayes/Rocket.jl"
 uuid = "df971d30-c9d6-4b37-b8ff-e965b2cb3a40"
 version = "1.8.2"
 
