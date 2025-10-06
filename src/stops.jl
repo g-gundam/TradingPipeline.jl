@@ -34,6 +34,7 @@ struct MoveCondition  <: HSM.AbstractHsmEvent end
 struct StoppedOut     <: HSM.AbstractHsmEvent end
 struct PositionClosed <: HSM.AbstractHsmEvent end
 
+# global variables
 # state instances
 hsm                     = StopLossStateMachine(nothing, nothing)
 neutral                 = Neutral(hsm, nothing)

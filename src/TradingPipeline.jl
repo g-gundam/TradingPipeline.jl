@@ -36,7 +36,7 @@ export @pnl, @pnls, Contracts
 # TODO: Fix this this is weird.  i should do it more like perl where the
 # module keyword is already in the included file.
 module Stops
-include("stops.jl")
+include("stops.jl") # This is like the stop version of hsm*.jl.
 end
 
 ## module TradingPipeline.MOS
@@ -60,11 +60,15 @@ include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("strategies/hma2.jl")
 
+include("abstract_stops.jl")
+include("stops/default.jl") # Set an initial stop and let it sit until it's hit or the position closes.
+
 export load_strategy
 include("candles.jl")
 include("rocket.jl")
 include("pipeline.jl")
 export simulate
+export backtest
 
 end
 
