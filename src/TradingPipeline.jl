@@ -95,9 +95,15 @@ import HierarchicalStateMachines as HSM
 using TradingPipeline
 using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable
 using TradingPipeline: load_strategy, report
-
 candle_observable = df_candles_observable(btcusd1m)
-@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMA2Strategy);
+
+# old way
+#@unpack hsm, simulator_session, chart_subject = simulate(candle_observable, HMA2Strategy);
+
+# new way
+strategy_config = HMA2Strategy => Dict()
+@unpack hsm, simulator_session, chart_subject = backtest(candle_observable, strategy_config);
+
 rdf = report(simulator_session)
 
 sum(rdf.pnl)
