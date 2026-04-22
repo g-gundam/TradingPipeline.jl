@@ -13,6 +13,10 @@ using HTTP: WebSocket, WebSockets
 # - I just realized the switch has to be lazy!
 
 # First, let's take a DataFrame and make it into an Observable.
+"""$(TYPEDSIGNATURES)
+
+Take a DataFrame and return an observable that emits candles.
+"""
 function df_candles_observable(df::DataFrame)
     Rocket.iterable(map(row -> Candle(
         row.ts,
