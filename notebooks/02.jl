@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.20.3
+# v0.20.25
 
 using Markdown
 using InteractiveUtils
@@ -60,7 +60,7 @@ end
 md"""
 # 02 - Template for using latest unregistered libraries
 
-- 00.jl is meant to be a template for strategy backtesting in Pluto notebooks.
+- 02.jl is meant to be a template for strategy backtesting in Pluto notebooks.
 - It assumes a certain directory structure in order to load the latest versions of my libraries and be able to use Revise.jl in a notebook context.
 - Check out my Julia repos so that they're all next to each other like in the diagram.
 - Download the data pack from CryptoMarketData.jl and symlink it to data under TradingPipeline.jl
