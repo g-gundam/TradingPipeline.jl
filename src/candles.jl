@@ -5,7 +5,7 @@ using HTTP
 using HTTP: WebSocket, WebSockets
 using Visor
 using DataFrames
-using Dates()
+using Dates
 
 # This file will be all about creating candle observables.
 # - The original kind was a Rocket.iterable backed by a DataFrame.
