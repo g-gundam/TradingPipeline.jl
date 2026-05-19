@@ -1,7 +1,11 @@
 using Rocket
 using CryptoMarketData
+using CryptoMarketData: AbstractExchange, AbstractCandle, Bitstamp, PancakeSwap
 using HTTP
 using HTTP: WebSocket, WebSockets
+using Visor
+using DataFrames
+using Dates()
 
 # This file will be all about creating candle observables.
 # - The original kind was a Rocket.iterable backed by a DataFrame.
@@ -28,8 +32,18 @@ function df_candles_observable(df::DataFrame)
     ), eachrow(df)))
 end
 
-function ws_candles_observable(bitstamp::CryptoMarketData.Bitstamp)
-end
+"""$(TYPEDSIGNATURES)
 
-function ws_candles_observable(pancakeswap::CryptoMarketData.PancakeSwap)
+Start a websocket session and create an observable that emits candles from the websocket.
+"""
+function ws_candles_observable(exchange::AbstractExchange, market::AbstractString; from::Date=today())
+    # load a dataframe of candles from
+    # - local storage to the extent that we can
+    # - HTTP API for any missing gaps between now and the last locally saved candle
+    # continuously load future candles from a websocket
+    # - maintain collected candles in memory.
+    session = start(exchange, market)
+    (ch, t, o) = stream(session, from)
+    observable = Rocket.iterable(ch)
+    return (observable, session, ch, t, o)
 end
