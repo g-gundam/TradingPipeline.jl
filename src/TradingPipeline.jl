@@ -64,7 +64,7 @@ include("abstract_stops.jl")
 include("stops/default.jl") # Set an initial stop and let it sit until it's hit or the position closes.
 
 export load_strategy
-include("candles.jl")
+include("candles.jl")           # Observables
 include("rocket.jl")
 include("pipeline.jl")
 export simulate
