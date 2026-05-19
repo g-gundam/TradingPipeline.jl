@@ -19,3 +19,8 @@
 - It makes assumptions about where my other libraries are checked out.
   + It's setup to load development versions of most of my libraries.
 - To use it, copy it to another file in the same directory and load it into Pluto.
+
+## 03.jl
+
+- This is an even simpler template for notebook-based backtesting sessions.
+- It assumes the existence of a Julia environment named `@tpp` that's already pulled in local libraries I'm interested in.
