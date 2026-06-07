@@ -1,0 +1,10 @@
+#!/usr/bin/env julia -S --startup-file=no --color=yes --project=@pluto
+using Pluto
+secret  = if haskey(ENV, "PLUTO_SECRET")
+    ENV["PLUTO_SECRET"]
+else
+    ""
+end
+options = Pluto.Configuration.from_flat_kwargs(; auto_reload_from_file=true, launch_browser=false)
+session = Pluto.ServerSession(; options, secret)
+Pluto.run(session)
