@@ -56,6 +56,7 @@ include("explore.jl")
 export report
 
 include("abstract_strategy.jl")
+include("strategies/null.jl")
 include("strategies/goldencross.jl")
 include("strategies/hma.jl")
 include("strategies/hma2.jl")
