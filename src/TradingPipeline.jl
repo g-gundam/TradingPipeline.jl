@@ -95,7 +95,7 @@ btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"
 import TradingPipeline as TP
 import HierarchicalStateMachines as HSM
 using TradingPipeline
-using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable
+using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable, ws_candles_observable
 using TradingPipeline: load_strategy, report
 candle_observable = df_candles_observable(btcusd1m)
 
@@ -115,5 +115,12 @@ mean(rdf.percent)
 chart = chart_subject.charts[:trend]
 v = visualize((chart, simulator_session); min_height=800)
 lwc_show(v)
+
+=#
+
+#= Realtime
+
+bitstamp = Bitstamp()
+observable_team = ws_candles_observable(bitstamp, "BTCUSD"; from=Date("2026-07-20"))
 
 =#

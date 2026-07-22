@@ -45,5 +45,25 @@ function ws_candles_observable(exchange::AbstractExchange, market::AbstractStrin
     session = start(exchange, market)
     (ch, t, o) = stream(session, from)
     observable = Rocket.iterable(ch)
-    return (observable, session, ch, t, o)
+
+    # standardize on TechnicalIndicatorCharts.Candle
+    # INFO: This is my first time using Rocket.jl's map operator.
+    converted_observable = observable |> map(TechnicalIndicatorCharts.Candle, convert)
+
+    return (converted_observable, session, ch, t, o)
+end
+
+"""$(TYPEDSIGNATURES)
+
+Convert an AbstractCandle into a TechnicalIndicatorCharts.Candle.
+"""
+function Base.convert(::Type{TechnicalIndicatorCharts.Candle}, c::CryptoMarketData.AbstractCandle)
+    Candle(
+        candle_datetime(c),
+        c.o,
+        c.h,
+        c.l,
+        c.c,
+        c.v
+    )
 end
