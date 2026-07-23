@@ -1,6 +1,7 @@
 using Rocket
 using CryptoMarketData
 using CryptoMarketData: AbstractExchange, AbstractCandle, Bitstamp, PancakeSwap
+using TechnicalIndicatorCharts
 using HTTP
 using HTTP: WebSocket, WebSockets
 using Visor
@@ -48,7 +49,7 @@ function ws_candles_observable(exchange::AbstractExchange, market::AbstractStrin
 
     # standardize on TechnicalIndicatorCharts.Candle
     # INFO: This is my first time using Rocket.jl's map operator.
-    converted_observable = observable |> map(TechnicalIndicatorCharts.Candle, convert)
+    converted_observable = observable |> map(TechnicalIndicatorCharts.Candle, (c) -> convert(TechnicalIndicatorCharts.Candle, c))
 
     return (converted_observable, session, ch, t, o)
 end
