@@ -120,7 +120,9 @@ lwc_show(v)
 
 #= Realtime
 
+using Rocket
 bitstamp = Bitstamp()
 observable_team = ws_candles_observable(bitstamp, "BTCUSD"; from=Date("2026-07-20"))
+observable = observable_team[1]
 
 =#
