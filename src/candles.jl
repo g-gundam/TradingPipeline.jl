@@ -57,6 +57,7 @@ end
 """$(TYPEDSIGNATURES)
 
 Convert an AbstractCandle into a TechnicalIndicatorCharts.Candle.
+TradingPipeline.jl standardizes on TechnicalIndicatorCharts.Candle as a common denominator.
 """
 function Base.convert(::Type{TechnicalIndicatorCharts.Candle}, c::CryptoMarketData.AbstractCandle)
     Candle(

@@ -84,6 +84,7 @@ using CryptoMarketData
 using TechnicalIndicatorCharts
 using ReversedSeries
 import ExchangeOperations as XO
+import TradingPipeline as TP
 
 using Dates
 using UnPack
@@ -92,7 +93,6 @@ using LightweightCharts
 pancakeswap = PancakeSwap()
 btcusd1m = load(pancakeswap, "BTCUSD"; span=Date("2023-07-01"):Date("2024-11-29"))
 
-import TradingPipeline as TP
 import HierarchicalStateMachines as HSM
 using TradingPipeline
 using TradingPipeline: simulate, GoldenCrossStrategy, HMAStrategy, HMA2Strategy, df_candles_observable, ws_candles_observable
@@ -120,9 +120,12 @@ lwc_show(v)
 
 #= Realtime
 
+cd("..")
 using Rocket
 bitstamp = Bitstamp()
 observable_team = ws_candles_observable(bitstamp, "BTCUSD"; from=Date("2026-07-20"))
 observable = observable_team[1]
+strategy_config = HMA2Strategy => Dict()
+t2 = @start backtest(observable, strategy_config)
 
 =#
